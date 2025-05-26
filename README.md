@@ -1,11 +1,11 @@
-# Landing de Ofertas y Promociones - CRUD
+# APP CRUD Landing Ofertas y Promociones
 
-Esta aplicación es un CRUD para gestionar los productos de la landing de ofertas y promociones de Falabella. Permite agregar, editar, ocultar y eliminar productos, así como visualizar una lista de productos ocultos.
+App para gestionar los productos de la landing de ofertas y promociones de Falabella. Permite agregar, editar, ocultar, cambiar orden sellout y eliminar productos.
 
 ## Tecnologías principales
 
--  React + TypeScript - Framework principal con tipado estático
--  Vite - Herramienta de construcción y desarrollo
+-  React + TypeScript
+-  Vite - Construcción y desarrollo
 -  Supabase - Backend y base de datos
 -  ShadCN UI - Componentes visuales
 -  TanStack Table - Tabla interactiva
@@ -22,7 +22,7 @@ Esta aplicación es un CRUD para gestionar los productos de la landing de oferta
 
 ## Cómo usar el proyecto
 
-Instalación
+### Instalación
 Clonar el repositorio y ejecutar:
 
 ```js
@@ -67,7 +67,7 @@ Por seguridad, las credenciales y el acceso deben mantenerse confidenciales y co
 La configuración de Supabase ya está lista y vinculada con la aplicación.
 Las políticas de seguridad (RLS) están configuradas para permitir inserciones, lecturas, actualizaciones y eliminaciones según las reglas definidas.
 
-##### Contribuciones
+## Contribuciones
 
 Este proyecto fue creado y es mantenido por Jeison Garzón.
 Para cualquier mejora, puedes abrir un issue o pull request.
