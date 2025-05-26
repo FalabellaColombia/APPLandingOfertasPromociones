@@ -1,54 +1,73 @@
-# React + TypeScript + Vite
+## Landing de Ofertas y Promociones - CRUD
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Esta aplicación es un CRUD para gestionar los productos de la landing de ofertas y promociones de Falabella. Permite agregar, editar, ocultar y eliminar productos, así como visualizar una lista de productos ocultos.
 
-Currently, two official plugins are available:
+# Tecnologías principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-  React + TypeScript - Framework principal con tipado estático
+-  Vite - Herramienta de construcción y desarrollo
+-  Supabase - Backend y base de datos
+-  ShadCN UI - Componentes visuales
+-  TanStack Table - Tabla interactiva
+-  React Hook Form + Zod - Formularios y validación
 
-## Expanding the ESLint configuration
+# Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+-  Agregar productos
+-  Editar productos existentes
+-  Ocultar productos
+-  Eliminar productos
+-  Ver productos ocultos
+-  Subir productos masivamente desde archivo .csv (vía interfaz de Supabase)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+# Cómo usar el proyecto
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Instalación
+Clonar el repositorio y ejecutar:
 
 ```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+npm clone https://github.com/jeison0894/APPLandingOfertasPromociones.git
 ```
+
+```js
+npm install
+```
+
+Correr la aplicación
+
+```js
+npm run dev
+```
+
+## Uso de Supabase
+
+La aplicación utiliza Supabase como backend para gestionar la base de datos y la autenticación.
+
+La tabla principal es listProducts, donde se almacenan todos los productos.
+
+### Importar productos en masa (CSV)
+
+Para subir productos masivamente, usa la función de importación de CSV desde la consola de Supabase:
+
+1. Accede a https://app.supabase.com.
+2. Inicia sesión con la cuenta empresarial vinculada al proyecto.
+3. Selecciona el proyecto correspondiente.
+4. En el panel lateral, ve a Table Editor.
+5. Selecciona la tabla listProducts.
+6. Haz clic en Import CSV y carga tu archivo.
+
+### Credenciales y acceso
+
+El proyecto está asociado a una cuenta Supabase con un correo Gmail empresarial.
+
+Por seguridad, las credenciales y el acceso deben mantenerse confidenciales y compartirse únicamente con el equipo autorizado.
+
+## Notas
+
+La configuración de Supabase ya está lista y vinculada con la aplicación.
+Las políticas de seguridad (RLS) están configuradas para permitir inserciones, lecturas, actualizaciones y eliminaciones según las reglas definidas.
+
+## Contribuciones
+
+Este proyecto fue creado y es mantenido por Jeison Garzón.
+Para cualquier mejora, puedes abrir un issue o pull request.
