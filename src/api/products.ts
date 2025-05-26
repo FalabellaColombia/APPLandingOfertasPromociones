@@ -1,15 +1,16 @@
+import { TABLE_NAME } from '@/constants/tableName'
 import type { Product, ProductForm } from '@/types/product'
 import supabase from '@/utils/supabase'
 
 export async function getAllProducts(): Promise<Product[]> {
-   const { data, error } = await supabase.from('listProducts').select('*')
+   const { data, error } = await supabase.from(TABLE_NAME).select('*')
    if (error) throw error
    return data || []
 }
 
 export async function addProduct(product: ProductForm) {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .insert([product])
       .select()
    if (error) throw error
@@ -21,7 +22,7 @@ export async function hasDuplicateOrderSellout(
    editingProductId: string | null
 ) {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .select('id')
       .eq('orderSellout', product.orderSellout)
       .neq('id', editingProductId)
@@ -35,7 +36,7 @@ export async function editProduct(
    editingProductId: string | null
 ): Promise<Product[]> {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .update(dataToUpdate)
       .eq('id', editingProductId)
       .select()
@@ -44,20 +45,20 @@ export async function editProduct(
 }
 
 export async function deleteProduct(id: string) {
-   const { error } = await supabase.from('listProducts').delete().eq('id', id)
+   const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id)
    if (error) throw error
 }
 
 export async function upsertProducts(products: Product[]) {
    const { error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .upsert(products, { onConflict: 'id' })
    if (error) throw error
 }
 
 export async function hideProduct(id: string) {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .update({
          isProductHidden: true,
          orderSellout: null,
@@ -70,7 +71,7 @@ export async function hideProduct(id: string) {
 
 export async function getMaxOrderSellout(): Promise<number> {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .select('orderSellout')
       .not('isProductHidden', 'eq', true)
       .order('orderSellout', { ascending: false })
@@ -86,7 +87,7 @@ export async function unhideProduct(
    id: string
 ): Promise<Product> {
    const { data, error } = await supabase
-      .from('listProducts')
+      .from(TABLE_NAME)
       .update({
          isProductHidden: false,
          orderSellout: maxOrderSellout + 1,
