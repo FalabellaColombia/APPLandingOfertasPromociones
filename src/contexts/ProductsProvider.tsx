@@ -1,7 +1,7 @@
 // contexts/ProductsProvider.tsx
-import { ProductsContext } from './ProductsContext'
 import { useProductsProvider } from '../hooks/useProductsProvider'
 import type { ReactNode } from 'react'
+import { ProductsContext } from './ProductsContext'
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
    const value = useProductsProvider()

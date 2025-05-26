@@ -1,15 +1,12 @@
 import { MoonIcon, SunIcon } from 'lucide-react'
 import { Toggle } from '@/components/ui/toggle'
-import { useTheme } from '@/components/theme-provider'
-import { useState } from 'react'
+import { useTheme } from '@/hooks/useTheme'
 
 export default function DarkMode() {
-   const { setTheme } = useTheme()
-   const [theme, setLocalTheme] = useState<string>('dark')
+   const { theme, setTheme } = useTheme()
 
    const handleThemeToggle = () => {
       const newTheme = theme === 'dark' ? 'light' : 'dark'
-      setLocalTheme(newTheme)
       setTheme(newTheme)
    }
 
