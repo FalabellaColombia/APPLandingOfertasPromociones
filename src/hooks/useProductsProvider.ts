@@ -227,7 +227,6 @@ export function useProductsProvider() {
          const updatedList = allProducts.map((p) =>
             p.id === id ? hiddenProduct : p
          )
-
          const visibleProducts = getVisibleProducts(updatedList)
          const orderedProducts = reorderOrderSellout(visibleProducts)
          const fullyUpdatedList = updateVisibleOrderInAllProducts(
