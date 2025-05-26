@@ -16,6 +16,11 @@ export default function TableProducts() {
       columnFilters,
       setColumnFilters,
    } = useTableConfig()
+   
+   console.log({
+      totalItems: table.getFilteredRowModel().rows.length,
+      allItems: table.getRowModel().rows.length,
+   })
 
    return (
       <div>
@@ -43,7 +48,11 @@ export default function TableProducts() {
                   }}
                   pageSize={table.getState().pagination.pageSize}
                   onPageSizeChange={(size) => {
-                     setPagination((prev) => ({ ...prev, pageSize: size }))
+                     setPagination((prev) => ({
+                        ...prev,
+                        pageSize: size,
+                        pageIndex: 0,
+                     }))
                   }}
                   rowStart={
                      table.getState().pagination.pageIndex *
