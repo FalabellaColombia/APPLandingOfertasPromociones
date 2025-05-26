@@ -3,13 +3,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LoaderProducts } from './LoaderProducts'
 import { useProducts } from '@/hooks/useProducts'
-import type { ProductToMoveForm } from '@/types/product'
+import type { Product, ProductToMoveForm } from '@/types/product'
 import { productToMoveSchema } from '@/lib/schemas/product.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import supabase from '@/utils/supabase'
 import { useEffect } from 'react'
 import Sonner from './Sonner'
+import { adjustOrderSellout } from '@/utils/product.utils'
+import { upsertProducts } from '@/api/products'
 
 export default function FormMoveProduct() {
    const {
@@ -39,12 +40,14 @@ export default function FormMoveProduct() {
       setFormIsDirty(isDirty)
    }, [isDirty])
 
-   const onSubmitMoveProduct = async (data: ProductToMoveForm) => {
-      const newOrder = Number(data.neworderSellout)
-      const oldOrder = Number(productToMove.orderSellout)
-      const idToMove = productToMove.id
+   const onSubmitChangeOrderSellout = async (formData: ProductToMoveForm) => {
+      const newOrder = formData.neworderSellout
+      const currentOrder = Number(productToMove.orderSellout)
+      const productId = productToMove.id
 
-      if (newOrder === oldOrder) {
+      if (!productId) return
+
+      if (newOrder === currentOrder) {
          Sonner({
             message: 'El nuevo Orden Sellout no puede ser igual al actual',
             sonnerState: 'error',
@@ -52,71 +55,51 @@ export default function FormMoveProduct() {
          return
       }
 
-      if (!idToMove) return
+      const adjustedProducts = adjustOrderSellout(
+         products,
+         productId,
+         currentOrder,
+         newOrder
+      )
 
-      // Copia productos para modificar sin mutar original
-      let updatedProducts = products.map((p) => ({ ...p }))
-
-      // Ajustar orden de productos afectados
-      updatedProducts = updatedProducts.map((p) => {
-         if (p.id === idToMove) {
-            return { ...p, orderSellout: newOrder }
-         }
-
-         const movingUp = newOrder < oldOrder
-
-         if (
-            movingUp &&
-            p.orderSellout >= newOrder &&
-            p.orderSellout < oldOrder
-         ) {
-            return { ...p, orderSellout: p.orderSellout + 1 }
-         }
-
-         if (
-            !movingUp &&
-            p.orderSellout > oldOrder &&
-            p.orderSellout <= newOrder
-         ) {
-            return { ...p, orderSellout: p.orderSellout - 1 }
-         }
-
-         return p
-      })
-
-      // Hacer upsert masivo en Supabase
-      const { error } = await supabase
-         .from('listProducts')
-         .upsert(updatedProducts, { onConflict: 'id' })
-
-      if (error) {
-         console.error('Error al actualizar productos:', error)
-         Sonner({
-            message: 'Error al actualizar el orden de productos',
-            sonnerState: 'error',
-         })
-      } else {
-         // Actualizar estado local con productos nuevos
-         setProducts(updatedProducts)
-         setAllProducts((prev) =>
-            prev.map((p) => {
-               const updated = updatedProducts.find((up) => up.id === p.id)
-               return updated ? updated : p
-            })
-         )
+      try {
+         await upsertProducts(adjustedProducts)
+         applyProductUpdate(adjustedProducts)
 
          Sonner({
-            message: 'Orden actualizado correctamente',
+            message: 'Orden Sellout actualizado correctamente',
             sonnerState: 'success',
          })
 
          setIsFormOrderSelloutOpen(false)
          setOpenDrawer(false)
+      } catch (error) {
+         if (error) {
+            console.error('Error al actualizar productos:', error)
+            Sonner({
+               message: 'Error al actualizar el Orden Sellout',
+               sonnerState: 'error',
+            })
+            return
+         }
       }
    }
 
+   const applyProductUpdate = (updatedProducts: Product[]) => {
+      setProducts(updatedProducts)
+
+      setAllProducts((prev) =>
+         prev.map((p) => {
+            const updated = updatedProducts.find((up) => up.id === p.id)
+            return updated ? updated : p
+         })
+      )
+   }
+
    return (
-      <form className="space-y-5" onSubmit={handleSubmit(onSubmitMoveProduct)}>
+      <form
+         className="space-y-5"
+         onSubmit={handleSubmit(onSubmitChangeOrderSellout)}>
          <h3 className="mb-5 font-bold border-b-1 pb-3">
             Cambiar Orden Sellout
          </h3>

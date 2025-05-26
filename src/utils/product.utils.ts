@@ -88,3 +88,33 @@ export function moveProductToEnd(
    const filtered = products.filter((p) => p.id !== idProduct)
    return [...filtered, updatedProduct]
 }
+
+export const adjustOrderSellout = (
+   products: Product[],
+   targetId: string,
+   oldOrder: number,
+   newOrder: number
+): Product[] => {
+   const movingUp = newOrder < oldOrder
+
+   return products.map((p) => {
+      if (p.id === targetId) {
+         return { ...p, orderSellout: newOrder }
+      }
+
+      if (movingUp && p.orderSellout >= newOrder && p.orderSellout < oldOrder) {
+         return { ...p, orderSellout: p.orderSellout + 1 }
+      }
+
+      if (
+         !movingUp &&
+         p.orderSellout > oldOrder &&
+         p.orderSellout <= newOrder
+      ) {
+         return { ...p, orderSellout: p.orderSellout - 1 }
+      }
+
+      return p
+   })
+}
+
