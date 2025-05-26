@@ -24,14 +24,14 @@ export default function Form() {
       handleSubmit,
       Controller,
       control,
-      isEditing,
+      formEditingIsOpen,
       onSubmitForm,
    } = useProducts()
 
    return (
       <form className="space-y-5" onSubmit={handleSubmit(onSubmitForm)}>
          <h3 className="mb-5 font-bold border-b-1 pb-3">
-            {isEditing ? 'Editar Producto' : 'Agregar Producto'}
+            {formEditingIsOpen ? 'Editar Producto' : 'Agregar Producto'}
          </h3>
          {/* Orden Sellout */}
          <div className="*:not-first:mt-1 mb-3 w-full">
@@ -295,7 +295,7 @@ export default function Form() {
          <Button type="submit" className="w-full" disabled={isloadingButton}>
             {isloadingButton ? (
                <LoaderProducts />
-            ) : isEditing ? (
+            ) : formEditingIsOpen ? (
                'Editar'
             ) : (
                'Agregar'

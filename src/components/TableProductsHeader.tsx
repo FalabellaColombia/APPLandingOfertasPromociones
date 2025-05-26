@@ -18,13 +18,14 @@ export default function TableProductsHeader({
    activeButton,
    isFormOrderSelloutOpen,
 }: TableHeader) {
-   const { products, reset, setIsEditing, setOpenDrawer, openDrawer } = useProducts()
+   const { products, reset, setFormEditingIsOpen, setOpenDrawer, openDrawer } =
+      useProducts()
 
    const handleAddProductClick = () => {
       const nextorderSellout = getNextorderSellout(products)
       reset(getDefaultAddProductForm(nextorderSellout))
       setOpenDrawer(true)
-      setIsEditing(false)
+      setFormEditingIsOpen(false)
    }
 
    return (

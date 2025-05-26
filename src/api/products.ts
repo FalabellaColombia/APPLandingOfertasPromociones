@@ -65,7 +65,7 @@ export async function hideProduct(id: string) {
       .eq('id', id)
       .select()
    if (error) throw error
-   return data
+   return data[0]
 }
 
 export async function getMaxOrderSellout(): Promise<number> {

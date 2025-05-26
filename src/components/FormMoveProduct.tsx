@@ -41,7 +41,7 @@ export default function FormMoveProduct() {
    }, [isDirty])
 
    const onSubmitChangeOrderSellout = async (formData: ProductToMoveForm) => {
-      const newOrder = formData.neworderSellout
+      const newOrder = Number(formData.neworderSellout)
       const currentOrder = Number(productToMove.orderSellout)
       const productId = productToMove.id
 

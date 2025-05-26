@@ -67,7 +67,6 @@ export function getDefaultEditProductForm(product: Product) {
 
 export function reorderOrderSellout(products: Product[]): Product[] {
    return products
-      .slice()
       .sort((a, b) => a.orderSellout - b.orderSellout)
       .map((p, i) => ({ ...p, orderSellout: i + 1 }))
 }
@@ -118,3 +117,16 @@ export const adjustOrderSellout = (
    })
 }
 
+export function updateVisibleOrderInAllProducts(
+   allProducts: Product[],
+   orderedVisibleProducts: Product[]
+): Product[] {
+   const visibleIds = new Set(orderedVisibleProducts.map((p) => p.id))
+   return allProducts.map((product) => {
+      if (visibleIds.has(product.id)) {
+         const updated = orderedVisibleProducts.find((p) => p.id === product.id)
+         return updated ?? product
+      }
+      return product
+   })
+}

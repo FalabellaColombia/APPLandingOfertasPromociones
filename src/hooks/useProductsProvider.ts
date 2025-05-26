@@ -23,6 +23,7 @@ import {
    getVisibleProducts,
    moveProductToEnd,
    reorderOrderSellout,
+   updateVisibleOrderInAllProducts,
 } from '@/utils/product.utils'
 import Sonner from '@/components/Sonner'
 
@@ -33,7 +34,7 @@ export function useProductsProvider() {
    const [isloadingButton, setIsloadingButton] = useState(false)
    const [isModalOpen, setIsModalOpen] = useState(false)
    const [openDrawer, setOpenDrawer] = useState(false)
-   const [isEditing, setIsEditing] = useState(false)
+   const [formEditingIsOpen, setFormEditingIsOpen] = useState(false)
    const [idProductToEdit, setIdProductToEdit] = useState<string | null>(null)
    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
    const [activeButton, setActiveButton] = useState<string>(VIEW_LISTADO)
@@ -81,7 +82,7 @@ export function useProductsProvider() {
    }, [isDirty])
 
    const onSubmitForm = (data: ProductForm) => {
-      if (isEditing) {
+      if (formEditingIsOpen) {
          handleEditProduct(data)
       } else {
          handleAddProduct(data)
@@ -118,7 +119,7 @@ export function useProductsProvider() {
    }
 
    const handlePrepareEditForm = (product: Product) => {
-      setIsEditing(true)
+      setFormEditingIsOpen(true)
       setIdProductToEdit(product.id || null)
       reset(getDefaultEditProductForm(product))
       setOpenDrawer(true)
@@ -157,7 +158,7 @@ export function useProductsProvider() {
                   p.id === idProductToEdit ? productUpdated[0] : p
                )
             )
-            setIsEditing(false)
+            setFormEditingIsOpen(false)
             setOpenDrawer(false)
             reset(getDefaultResetForm())
             setIdProductToEdit(null)
@@ -184,10 +185,14 @@ export function useProductsProvider() {
          await deleteProduct(id)
          const updateList = allProducts.filter((p) => p.id !== id)
          setAllProducts(updateList)
-
          if (activeButton === VIEW_LISTADO) {
             const visibleProducts = getVisibleProducts(updateList)
             const orderedProducts = reorderOrderSellout(visibleProducts)
+            const fullyUpdatedList = updateVisibleOrderInAllProducts(
+               updateList,
+               orderedProducts
+            )
+            setAllProducts(fullyUpdatedList)
             await upsertProducts(orderedProducts)
             setProducts(orderedProducts)
          } else {
@@ -218,15 +223,21 @@ export function useProductsProvider() {
       }
 
       try {
-         const [hiddenProduct] = await hideProduct(id)
-         const updateList = allProducts.map((p) =>
+         const hiddenProduct = await hideProduct(id)
+         const updatedList = allProducts.map((p) =>
             p.id === id ? hiddenProduct : p
          )
-         const visibleProducts = getVisibleProducts(updateList)
+
+         const visibleProducts = getVisibleProducts(updatedList)
          const orderedProducts = reorderOrderSellout(visibleProducts)
+         const fullyUpdatedList = updateVisibleOrderInAllProducts(
+            updatedList,
+            orderedProducts
+         )
          await upsertProducts(orderedProducts)
-         setAllProducts(updateList)
+         setAllProducts(fullyUpdatedList)
          setProducts(orderedProducts)
+
          Sonner({
             message: 'Producto ocultado correctamente',
             sonnerState: 'success',
@@ -255,10 +266,11 @@ export function useProductsProvider() {
          const unhiddenProduct = await unhideProduct(maxOrderSellout, id)
          const updatedList = moveProductToEnd(allProducts, id, unhiddenProduct)
          const visibles = getVisibleProducts(updatedList)
-         const orderedProducts = reorderOrderSellout(visibles)
+
          setAllProducts(updatedList)
-         setProducts(orderedProducts)
+         setProducts(visibles)
          setActiveButton(VIEW_LISTADO)
+
          Sonner({
             message: 'Producto desocultado correctamente',
             sonnerState: 'success',
@@ -319,8 +331,8 @@ export function useProductsProvider() {
       openDrawer,
       setOpenDrawer,
       handleBackdropDrawerClick,
-      isEditing,
-      setIsEditing,
+      formEditingIsOpen,
+      setFormEditingIsOpen,
       showConfirmDialog,
       setShowConfirmDialog,
       activeButton,
