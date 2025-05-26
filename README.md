@@ -48,9 +48,9 @@ La tabla principal es listProducts, donde se almacenan todos los productos.
 
 ### Importar productos en masa (CSV)
 
-Para subir productos masivamente, usa la función de importación de CSV desde la consola de Supabase:
-
 > Se recomienda descargar el archivo CSV directamente desde Google Sheets para evitar problemas de formato.
+
+Para subir productos masivamente, usa la función de importación de CSV desde la consola de Supabase:
 
 1. Accede a https://app.supabase.com.
 2. Inicia sesión con la cuenta empresarial vinculada al proyecto.
