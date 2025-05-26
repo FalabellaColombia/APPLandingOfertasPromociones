@@ -16,7 +16,7 @@ export default function TableProducts() {
       columnFilters,
       setColumnFilters,
    } = useTableConfig()
-   
+
    console.log({
       totalItems: table.getFilteredRowModel().rows.length,
       allItems: table.getRowModel().rows.length,
