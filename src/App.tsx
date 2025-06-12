@@ -3,13 +3,13 @@ import './App.css'
 import { ProductsProvider } from './contexts/ProductsProvider'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from './contexts/ThemeProvider'
-import Component from './components/comp-326'
+import LoginForm from './features/auth/components/LoginForm'
 
 function App() {
    return (
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
          <ProductsProvider>
-            <Component />
+            <LoginForm />
             {/*  <Main /> */}
             <Toaster position="bottom-left" />
          </ProductsProvider>

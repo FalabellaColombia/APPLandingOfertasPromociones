@@ -1,4 +1,4 @@
-function Authentication() {
+function LoginPage() {
     return ( 
         <>
         <h1>Authentication</h1>
@@ -6,4 +6,4 @@ function Authentication() {
      );
 }
 
-export default Authentication;
+export default LoginPage;
