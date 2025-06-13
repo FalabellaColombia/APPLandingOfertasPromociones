@@ -77,11 +77,11 @@ export default function LoginForm() {
             onSubmit={handleSubmit(onSubmitLogin)}>
             <div className="space-y-4">
                <div className="*:not-first:mt-2">
-                  <Label htmlFor={`email`}>Correo electrónico</Label>
+                  <Label htmlFor={`email`}>Email</Label>
                   <Input
                      className="peer"
                      id={`email`}
-                     placeholder="correo@tuempresa.com"
+                     placeholder="Ingresa el email"
                      type="email"
                      aria-invalid={!!errors.email}
                      {...register('email')}
@@ -100,7 +100,7 @@ export default function LoginForm() {
                   <Input
                      className="peer"
                      id={`password`}
-                     placeholder="Ingresa tu contraseña"
+                     placeholder="Ingresa la contraseña"
                      type="password"
                      aria-invalid={!!errors.password}
                      {...register('password')}
