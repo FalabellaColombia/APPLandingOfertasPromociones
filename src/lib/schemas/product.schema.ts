@@ -48,8 +48,7 @@ export const productFormSchema = z.object({
             message: 'La fecha debe ser válida',
          })
    ),
-
-   offerState: z.string().optional(),
+   offerState: z.string().nullable().optional(),
    isProductHidden: z.boolean().optional(),
 })
 

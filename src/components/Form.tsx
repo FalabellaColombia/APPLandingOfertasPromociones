@@ -274,9 +274,7 @@ export default function Form() {
                className="peer bg-muted border-transparent shadow-none"
                aria-invalid={!!errors.offerState}
                {...register('offerState')}>
-               <option value="" disabled>
-                  Selecciona un estado
-               </option>
+               <option value="">Sin estado</option>
                <option value="LANZAMIENTO">Lanzamiento</option>
                <option value="SOLO X 24 HORAS">Solo X 24 Horas</option>
                <option value="SOLO X 48 HORAS">Solo X 48 Horas</option>
