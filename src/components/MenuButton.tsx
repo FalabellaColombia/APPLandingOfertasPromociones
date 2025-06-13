@@ -24,7 +24,7 @@ export default function MenuButton({
          className={`group ${
             isActive ? '' : 'text-muted-foreground'
          }`}
-         variant="ghost"
+         variant="outline"
          onClick={functionOnClick}>
          {Icon && (
             <Icon

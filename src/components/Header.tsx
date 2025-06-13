@@ -8,6 +8,7 @@ import {
    getVisibleProducts,
    reorderOrderSellout,
 } from '@/utils/product.utils'
+import Logout from '@/features/auth/components/Logout'
 
 function Header() {
    const {
@@ -30,7 +31,7 @@ function Header() {
                <SquareArrowOutUpRight className="h-4 w-4" />
             </a>
          </div>
-         <div className="flex space-x-4">
+         <div className="flex space-x-3">
             <MenuButton
                text={VIEW_LISTADO}
                functionOnClick={() => {
@@ -53,8 +54,9 @@ function Header() {
                }}
                isActive={activeButton === VIEW_OCULTOS}
             />
-            <div className="pl-4 border-l-1 ">
+            <div className="flex space-x-1 pl-3 border-l-1 ">
                <DarkMode />
+               <Logout />
             </div>
          </div>
       </div>

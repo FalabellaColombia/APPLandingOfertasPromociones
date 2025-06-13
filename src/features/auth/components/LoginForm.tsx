@@ -7,7 +7,6 @@ import { loginSchema, type LoginFormValues } from '../schema/login.schema'
 import supabase from '@/utils/supabase'
 import Sonner from '@/components/Sonner'
 import { useNavigate } from 'react-router-dom'
-
 export default function LoginForm() {
    const {
       register,
@@ -16,7 +15,6 @@ export default function LoginForm() {
    } = useForm<LoginFormValues>({
       resolver: zodResolver(loginSchema),
    })
-
    const navigate = useNavigate()
 
    const onSubmitLogin = async (data: LoginFormValues) => {
@@ -29,15 +27,18 @@ export default function LoginForm() {
 
       if (error) {
          Sonner({
-            message: 'Error iniciando sesion',
+            message: 'No se pudo iniciar sesión',
+            description: 'Verifica el correo y la contraseña',
             sonnerState: 'error',
+            position: 'bottom-right',
          })
          return
       }
 
       Sonner({
-         message: 'Ingreso exitoso',
+         message: 'Inicio de sesión exitoso',
          sonnerState: 'success',
+         position: 'bottom-right',
       })
       setTimeout(() => {
          navigate('/dashboard')
@@ -45,8 +46,8 @@ export default function LoginForm() {
    }
 
    return (
-      <div className="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl border p-6 shadow-lg duration-200 sm:max-w-100">
-         <div className="flex flex-col items-center gap-2">
+      <div className="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-xl border p-6 shadow-lg duration-200 sm:max-w-100">
+         <div className="flex flex-col items-center gap-3">
             <div
                className="flex size-11 shrink-0 items-center justify-center rounded-full border"
                aria-hidden="true">
@@ -61,8 +62,8 @@ export default function LoginForm() {
                </svg>
             </div>
             <div className="mb-1">
-               <h1 className="sm:text-center mb-1 text-lg font-bold">
-                  Bienvenido
+               <h1 className="sm:text-center mb-2 text-lg font-bold">
+                  APP Landing Falabella
                </h1>
                <h2 className="sm:text-center text-muted-foreground text-sm">
                   Ingresa tu correo y contraseña para acceder.
