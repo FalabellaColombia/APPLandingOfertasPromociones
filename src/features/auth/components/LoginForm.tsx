@@ -66,7 +66,7 @@ export default function LoginForm() {
                   APP Landing Falabella
                </h1>
                <h2 className="sm:text-center text-muted-foreground text-sm">
-                  Ingresa tu correo y contraseña para acceder.
+                  Ingresa tu email y contraseña para acceder.
                </h2>
             </div>
          </div>
