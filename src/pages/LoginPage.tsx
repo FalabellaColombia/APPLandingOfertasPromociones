@@ -1,9 +1,7 @@
+import LoginForm from '@/features/auth/components/LoginForm'
+
 function LoginPage() {
-    return ( 
-        <>
-        <h1>Authentication</h1>
-        </>
-     );
+   return <LoginForm />
 }
 
-export default LoginPage;
+export default LoginPage

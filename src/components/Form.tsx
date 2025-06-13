@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SelectNative } from './ui/select-native'
-import { LoaderProducts } from './LoaderProducts'
 import { useProducts } from '@/hooks/useProducts'
 import { CalendarIcon } from 'lucide-react'
 import {
@@ -15,6 +14,7 @@ import {
 } from 'react-aria-components'
 import { DateInput } from './ui/datefield-rac'
 import { Calendar } from '@/components/ui/calendar-rac'
+import { Loader } from './Loader'
 
 export default function Form() {
    const {
@@ -294,7 +294,7 @@ export default function Form() {
 
          <Button type="submit" className="w-full" disabled={isloadingButton}>
             {isloadingButton ? (
-               <LoaderProducts />
+               <Loader />
             ) : formEditingIsOpen ? (
                'Editar'
             ) : (

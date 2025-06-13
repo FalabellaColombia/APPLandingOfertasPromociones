@@ -7,11 +7,15 @@ import {
    TableRow,
 } from '@/components/ui/table'
 import { flexRender } from '@tanstack/react-table'
-import { LoaderProducts } from './LoaderProducts'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import type { TableProductsBody } from '@/types/table'
+import { Loader } from './Loader'
 
-export default function TableProductsBody({ isLoading, products, table }: TableProductsBody) {
+export default function TableProductsBody({
+   isLoading,
+   products,
+   table,
+}: TableProductsBody) {
    return (
       <div className="bg-background overflow-hidden rounded-md border mt-4">
          <Table>
@@ -50,7 +54,7 @@ export default function TableProductsBody({ isLoading, products, table }: TableP
                      <TableCell
                         colSpan={table.getAllColumns().length}
                         className="py-5 text-center">
-                        <LoaderProducts />
+                        <Loader />
                      </TableCell>
                   </TableRow>
                ) : products.length === 0 ? (
@@ -82,4 +86,3 @@ export default function TableProductsBody({ isLoading, products, table }: TableP
       </div>
    )
 }
-

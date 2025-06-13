@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginFormValues } from '../schema/login.schema'
 import supabase from '@/utils/supabase'
 import Sonner from '@/components/Sonner'
+import { useNavigate } from 'react-router-dom'
 
 export default function LoginForm() {
    const {
@@ -15,6 +16,8 @@ export default function LoginForm() {
    } = useForm<LoginFormValues>({
       resolver: zodResolver(loginSchema),
    })
+
+   const navigate = useNavigate()
 
    const onSubmitLogin = async (data: LoginFormValues) => {
       const { email, password } = data
@@ -26,7 +29,7 @@ export default function LoginForm() {
 
       if (error) {
          Sonner({
-            message: 'Este usuario no se encuentra registrado',
+            message: 'Error iniciando sesion',
             sonnerState: 'error',
          })
          return
@@ -36,6 +39,9 @@ export default function LoginForm() {
          message: 'Ingreso exitoso',
          sonnerState: 'success',
       })
+      setTimeout(() => {
+         navigate('/dashboard')
+      }, 1000)
    }
 
    return (

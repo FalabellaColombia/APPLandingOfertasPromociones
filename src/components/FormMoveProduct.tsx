@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { LoaderProducts } from './LoaderProducts'
+import { Loader } from './Loader'
 import { useProducts } from '@/hooks/useProducts'
 import type { Product, ProductToMoveForm } from '@/types/product'
 import { productToMoveSchema } from '@/lib/schemas/product.schema'
@@ -128,7 +128,7 @@ export default function FormMoveProduct() {
          </div>
 
          <Button type="submit" className="w-full" disabled={isloadingButton}>
-            {isloadingButton ? <LoaderProducts /> : 'Enviar'}
+            {isloadingButton ? <Loader /> : 'Enviar'}
          </Button>
       </form>
    )
