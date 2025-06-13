@@ -49,7 +49,7 @@ export const productFormSchema = z.object({
          })
    ),
 
-   offerState: z.string().min(1, 'El estado de la oferta es obligatorio'),
+   offerState: z.string().optional(),
    isProductHidden: z.boolean().optional(),
 })
 
