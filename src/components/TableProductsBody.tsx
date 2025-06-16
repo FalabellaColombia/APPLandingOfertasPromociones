@@ -28,7 +28,9 @@ export default function TableProductsBody({
                         <TableHead
                            key={header.id}
                            onClick={header.column.getToggleSortingHandler?.()}
-                           className="h-10 pl-1 cursor-pointer select-none">
+                           className="h-10 pl-1 cursor-pointer select-none"
+                           style={{ width: header.getSize() }}
+                           >
                            <div className="flex items-center gap-1">
                               {flexRender(
                                  header.column.columnDef.header,

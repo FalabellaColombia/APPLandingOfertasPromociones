@@ -8,20 +8,25 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: 'orderSellout',
       header: 'Orden Sellout',
       enableSorting: true,
+      size: 130,
    },
    {
       accessorKey: 'category',
       header: 'Categoría',
       enableSorting: true,
+      enableColumnFilter: true,
+      size: 130,
    },
    {
       accessorKey: 'title',
       header: 'Llamado',
       enableSorting: true,
+      size: 350,
    },
    {
       accessorKey: 'urlProduct',
       header: 'URL Producto',
+      size: 130,
       cell: ({ getValue }) => {
          const url = getValue<string>()
          return (
@@ -34,6 +39,7 @@ export const columns: ColumnDef<Product>[] = [
    {
       accessorKey: 'urlImage',
       header: 'URL Imagen',
+      size: 130,
       cell: ({ getValue }) => {
          const url = getValue<string>()
          return (
@@ -47,19 +53,23 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: 'startDate',
       header: 'Fecha Inicio',
       enableSorting: true,
+      size: 130,
    },
    {
       accessorKey: 'endDate',
       header: 'Fecha Fin',
       enableSorting: true,
+      size: 130,
    },
    {
       accessorKey: 'offerState',
       header: 'Estado Oferta',
       enableSorting: true,
+      size: 130,
    },
    {
       id: 'actions',
+      size: 60,
       cell: ({ row }) => {
          return <DropDownMenu productInfo={row.original} />
       },
