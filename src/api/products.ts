@@ -17,20 +17,6 @@ export async function addProduct(product: ProductForm) {
    return data || []
 }
 
-export async function hasDuplicateOrderSellout(
-   product: ProductForm,
-   editingProductId: string | null
-) {
-   const { data, error } = await supabase
-      .from(TABLE_NAME)
-      .select('id')
-      .eq('orderSellout', product.orderSellout)
-      .neq('id', editingProductId)
-      .limit(1)
-   if (error) throw error
-   return data.length > 0
-}
-
 export async function editProduct(
    dataToUpdate: ProductForm,
    editingProductId: string | null

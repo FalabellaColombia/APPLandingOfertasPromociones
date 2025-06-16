@@ -10,7 +10,6 @@ import {
    editProduct,
    getAllProducts,
    getMaxOrderSellout,
-   hasDuplicateOrderSellout,
    hideProduct,
    unhideProduct,
    upsertProducts,
@@ -135,17 +134,6 @@ export function useProductsProvider() {
       }
       setIsloadingButton(true)
       try {
-         const hasDuplicate = await hasDuplicateOrderSellout(
-            formData,
-            idProductToEdit
-         )
-         if (hasDuplicate) {
-            Sonner({
-               message: `El orden sellout "${formData.orderSellout}" ya está asignado a otro producto`,
-               sonnerState: 'error',
-            })
-            return
-         }
          const dataToUpdate = formatProductDates(formData)
          const productUpdated = await editProduct(dataToUpdate, idProductToEdit)
          if (productUpdated) {
