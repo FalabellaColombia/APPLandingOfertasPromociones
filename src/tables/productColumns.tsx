@@ -8,7 +8,7 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: 'orderSellout',
       header: 'Orden Sellout',
       enableSorting: true,
-      size: 130,
+      size: 120,
    },
    {
       accessorKey: 'category',
@@ -16,6 +16,9 @@ export const columns: ColumnDef<Product>[] = [
       enableSorting: true,
       enableColumnFilter: true,
       size: 130,
+      filterFn: (row, columnId, filterValue: string[]) => {
+         return filterValue.includes(row.getValue(columnId))
+      },
    },
    {
       accessorKey: 'title',
@@ -65,7 +68,11 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: 'offerState',
       header: 'Estado Oferta',
       enableSorting: true,
+      enableColumnFilter: true,
       size: 130,
+      filterFn: (row, columnId, filterValue: string[]) => {
+         return filterValue.includes(row.getValue(columnId))
+      },
    },
    {
       id: 'actions',

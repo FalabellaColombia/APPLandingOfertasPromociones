@@ -10,7 +10,7 @@ export interface SearchProps {
 export default function Search({ value, onChange }: SearchProps) {
    const id = useId()
    return (
-      <div className="*:not-first:mt-2 mb-4 w-55">
+      <div className="*:not-first:mt-2 w-55">
          <div className="relative">
             <Input
                id={id}
