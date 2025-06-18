@@ -72,7 +72,7 @@ export default function Form() {
                   Selecciona una categoría
                </option>
                <option value="Tecnologia">Tecnologia</option>
-               <option value="ElectroHogar">ElectroHogar</option>
+               <option value="Electrohogar">Electrohogar</option>
                <option value="VestuarioMujer">Vestuario Mujer</option>
                <option value="VestuarioHombre">Vestuario Hombre</option>
                <option value="Infantil">Infantil</option>
