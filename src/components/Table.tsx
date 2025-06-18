@@ -13,15 +13,15 @@ export default function TableProducts() {
       activeButton,
       isFormOrderSelloutOpen,
       setPagination,
-      columnFilters,
-      setColumnFilters,
    } = useTableConfig()
+
+   const noProducts = products.length === 0
+   const noSearchFilterResults = table.getFilteredRowModel().rows.length === 0
+   const hasNoResults = noProducts || noSearchFilterResults
 
    return (
       <div>
          <TableProductsHeader
-            columnFilters={columnFilters}
-            setColumnFilters={setColumnFilters}
             activeButton={activeButton}
             openDrawer={openDrawer}
             setOpenDrawer={setOpenDrawer}
@@ -33,7 +33,9 @@ export default function TableProducts() {
             table={table}
          />
 
-         {products.length !== 0 && (
+         {hasNoResults ? (
+            ''
+         ) : (
             <div className="mt-4">
                <TableProductsPagination
                   currentPage={table.getState().pagination.pageIndex + 1}

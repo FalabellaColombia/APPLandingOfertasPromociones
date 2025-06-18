@@ -16,8 +16,12 @@ export default function TableProductsBody({
    products,
    table,
 }: TableProductsBody) {
+   const noProducts = products.length === 0
+   const noSearchFilterResults = table.getFilteredRowModel().rows.length === 0
+   const hasNoResults = noProducts || noSearchFilterResults
+
    return (
-      <div className="bg-background overflow-hidden rounded-md border mt-4">
+      <div className="bg-background overflow-hidden rounded-md border mt-3">
          <Table>
             <TableHeader>
                {table.getHeaderGroups().map((headerGroup) => (
@@ -29,8 +33,7 @@ export default function TableProductsBody({
                            key={header.id}
                            onClick={header.column.getToggleSortingHandler?.()}
                            className="h-10 pl-1 cursor-pointer select-none"
-                           style={{ width: header.getSize() }}
-                           >
+                           style={{ width: header.getSize() }}>
                            <div className="flex items-center gap-1">
                               {flexRender(
                                  header.column.columnDef.header,
@@ -59,11 +62,11 @@ export default function TableProductsBody({
                         <Loader />
                      </TableCell>
                   </TableRow>
-               ) : products.length === 0 ? (
+               ) : hasNoResults ? (
                   <TableRow className="hover:bg-transparent">
                      <TableCell
                         colSpan={table.getAllColumns().length}
-                        className="py-10">
+                        className="py-8">
                         <p className="w-full grow text-sm text-center">
                            No se encontraron productos
                         </p>
