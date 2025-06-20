@@ -1,4 +1,3 @@
-// contexts/ProductsProvider.tsx
 import { useProductsProvider } from '../hooks/useProductsProvider'
 import type { ReactNode } from 'react'
 import { ProductsContext } from './ProductsContext'

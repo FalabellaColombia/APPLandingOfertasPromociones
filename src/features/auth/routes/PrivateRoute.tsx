@@ -17,12 +17,9 @@ export default function PrivateRoute({ children }: Props) {
          const {
             data: { session },
          } = await supabase.auth.getSession()
-
-         console.log(session)
          setIsAuthenticated(!!session)
          setIsLoading(false)
       }
-
       checkSession()
    }, [])
 

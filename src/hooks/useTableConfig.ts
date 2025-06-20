@@ -1,6 +1,5 @@
 import { columns } from '@/tables/productColumns'
 import {
-   type ColumnFiltersState,
    type SortingState,
    useReactTable,
    getCoreRowModel,
@@ -10,12 +9,10 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import { useProducts } from './useProducts'
-import { FILTER } from '@/constants/filterConstants'
+import { useFilters } from './useFilters'
 
 export function useTableConfig() {
-   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
-      { id: FILTER, value: '' },
-   ])
+   const { columnFilters, setColumnFilters } = useFilters()
    const [sorting, setSorting] = useState<SortingState>([
       { id: 'orderSellout', desc: false },
    ])
