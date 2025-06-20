@@ -25,6 +25,8 @@ import {
    updateVisibleOrderInAllProducts,
 } from '@/utils/product.utils'
 import Sonner from '@/components/Sonner'
+import supabase from '@/utils/supabase'
+import { TABLE_NAME } from '@/constants/tableName'
 
 export function useProductsProvider() {
    const [allProducts, setAllProducts] = useState<Product[]>([])
@@ -290,6 +292,57 @@ export function useProductsProvider() {
          setIsFormOrderSelloutOpen(false)
       }
    }
+
+   useEffect(() => {
+      const channel = supabase
+         .channel('products-realtime')
+         .on(
+            'postgres_changes',
+            {
+               event: '*',
+               schema: 'public',
+               table: TABLE_NAME, 
+            },
+            (payload) => {
+               const eventType = payload.eventType
+               const newProduct = payload.new as Product
+               const oldProduct = payload.old as Product
+
+               setAllProducts((prev) => {
+                  let updated = [...prev]
+
+                  switch (eventType) {
+                     case 'INSERT':
+                        updated = [...prev, newProduct]
+                        break
+                     case 'UPDATE':
+                        updated = prev.map((p) =>
+                           p.id === newProduct.id ? newProduct : p
+                        )
+                        break
+                     case 'DELETE':
+                        updated = prev.filter((p) => p.id !== oldProduct.id)
+                        break
+                  }
+
+                  if (activeButton === VIEW_LISTADO) {
+                     const visibles = getVisibleProducts(updated)
+                     setProducts(visibles)
+                  } else {
+                     const ocultos = updated.filter((p) => p.isProductHidden)
+                     setProducts(ocultos)
+                  }
+
+                  return updated
+               })
+            }
+         )
+         .subscribe()
+
+      return () => {
+         supabase.removeChannel(channel)
+      }
+   }, [activeButton])
 
    return {
       allProducts,
