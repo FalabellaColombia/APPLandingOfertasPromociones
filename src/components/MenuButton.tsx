@@ -23,7 +23,7 @@ export default function MenuButton({
       <Button
          className={`group ${
             isActive ? '' : 'text-muted-foreground'
-         }`}
+         } cursor-pointer`}
          variant="outline"
          onClick={functionOnClick}>
          {Icon && (

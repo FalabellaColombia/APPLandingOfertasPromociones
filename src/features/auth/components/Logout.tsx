@@ -32,10 +32,10 @@ function Logout() {
             <TooltipTrigger asChild>
                <Button
                   onClick={handleLogout}
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  className="size-9 hover:!bg-muted ">
-                  <LogOut size={16} className="shrink-0" aria-hidden="true" />
+                  className="size-9 hover:!bg-muted">
+                  <LogOut aria-hidden="true" />
                </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">Cerrar sesión</TooltipContent>

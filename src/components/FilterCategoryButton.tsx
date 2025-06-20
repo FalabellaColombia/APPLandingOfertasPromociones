@@ -28,7 +28,7 @@ export default function FilterCategoryButton() {
    return (
       <DropdownMenu>
          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" className='hover:!bg-muted'>
                <ListFilter size={16} />
             </Button>
          </DropdownMenuTrigger>

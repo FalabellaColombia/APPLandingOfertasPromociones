@@ -50,6 +50,7 @@ export function useProductsProvider() {
       title: '',
    })
    const [formIsDirty, setFormIsDirty] = useState<boolean>(false)
+   const [isSync, setIsSync] = useState<boolean>(false)
 
    const {
       register,
@@ -312,6 +313,12 @@ export function useProductsProvider() {
                const newProduct = payload.new as Product
                const oldProduct = payload.old as Product
 
+               setIsSync(true)
+
+               setTimeout(() => {
+                  setIsSync(false)
+               }, 1500)
+
                setAllProducts((prev) => {
                   let updated = [...prev]
 
@@ -387,5 +394,6 @@ export function useProductsProvider() {
       setIsFormOrderSelloutOpen,
       productToMove,
       handleChangeOrderSelloutForm,
+      isSync,
    }
 }

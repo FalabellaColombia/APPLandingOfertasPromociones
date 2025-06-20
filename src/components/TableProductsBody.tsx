@@ -21,7 +21,7 @@ export default function TableProductsBody({
    const hasNoResults = noProducts || noSearchFilterResults
 
    return (
-      <div className="bg-background overflow-hidden rounded-md border mt-3">
+      <div className="bg-background overflow-hidden rounded-md border mt-2">
          <Table>
             <TableHeader>
                {table.getHeaderGroups().map((headerGroup) => (

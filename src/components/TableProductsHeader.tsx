@@ -37,7 +37,7 @@ export default function TableProductsHeader({
 
    return (
       <>
-         <div className="flex justify-between space-x-4 mb-3">
+         <div className="flex justify-between space-x-4 mb-2">
             <div className="flex space-x-2.5">
                <Search
                   value={searchValue}
@@ -66,7 +66,7 @@ export default function TableProductsHeader({
                )}
             </div>
 
-            <div className="flex gap-3 m-0">
+            <div className="flex gap-2 m-0">
                {activeButton === VIEW_LISTADO && (
                   <Button
                      className="aspect-square max-sm:p-0 m-0"

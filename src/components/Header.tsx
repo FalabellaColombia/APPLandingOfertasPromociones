@@ -1,4 +1,4 @@
-import { SquareArrowOutUpRight } from 'lucide-react'
+import { RefreshCcw } from 'lucide-react'
 import DarkMode from './DarkMode'
 import MenuButton from './MenuButton'
 import { useProducts } from '@/hooks/useProducts'
@@ -9,6 +9,8 @@ import {
    reorderOrderSellout,
 } from '@/utils/product.utils'
 import Logout from '@/features/auth/components/Logout'
+import { cn } from '@/lib/utils'
+import appLogo from '../assets/appLogo.svg'
 
 function Header() {
    const {
@@ -17,21 +19,33 @@ function Header() {
       setActiveButton,
       setPagination,
       setProducts,
+      isSync,
    } = useProducts()
 
    return (
       <div className="flex items-center justify-between">
-         <div className="flex items-center space-x-3 mt-4 mb-7">
-            <h1 className=" text-lg font-bold line tracking-tight">
-               APP Landing Ofertas y Promociones
-            </h1>
+         <div className="flex items-center space-x-10 mt-4 mb-7">
             <a
+               className="flex items-center space-x-3 "
                href="https://www.falabella.com.co/falabella-co/page/descuentos_ofertas_falabella?sid=HO_V1_ENCUENTRAACALASOFERTASIMPERDIBLESDELASEMANA_OTROS_NA_S17_139"
                target="_blank">
-               <SquareArrowOutUpRight className="h-4 w-4" />
+               <img
+                  src={appLogo}
+                  alt="APP Landing Ofertas y Promociones"
+                  width={25}
+                  height={25}
+               />
+               <h1
+                  className="text-sm font-bold tracking-tight 
+               text-zinc-900 hover:text-zinc-500 
+               dark:text-white dark:hover:text-zinc-300
+               transition duration-200 ease-in-out">
+                  APP Landing
+               </h1>
             </a>
          </div>
-         <div className="flex space-x-3">
+
+         <div className="flex space-x-2">
             <MenuButton
                text={VIEW_LISTADO}
                functionOnClick={() => {
@@ -54,7 +68,20 @@ function Header() {
                }}
                isActive={activeButton === VIEW_OCULTOS}
             />
-            <div className="flex space-x-1 pl-3 border-l-1 ">
+         </div>
+
+         <div className="flex space-x-2">
+            <div
+               className={cn(
+                  'size-9 rounded-md flex items-center justify-center transition-all duration-250 ease-in-out',
+                  isSync
+                     ? 'opacity-100 spin-reverse text-lime-500'
+                     : 'opacity-0 pointer-events-none'
+               )}
+               title="Sincronizando cambios en tiempo real">
+               <RefreshCcw size={20} />
+            </div>
+            <div className="flex space-x-2 ">
                <DarkMode />
                <Logout />
             </div>

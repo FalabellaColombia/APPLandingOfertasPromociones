@@ -86,3 +86,16 @@
 body {
    font-family: 'Geist', sans-serif;
 }
+
+@keyframes spin-reverse {
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(-360deg);
+   }
+}
+
+.spin-reverse {
+   animation: spin-reverse 1.1s linear infinite;
+}
