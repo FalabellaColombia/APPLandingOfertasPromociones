@@ -93,12 +93,16 @@ export function useProductsProvider() {
    const handleAddProduct = async (formData: ProductForm) => {
       setIsloadingButton(true)
       try {
-         const dataToSend = formatProductDates(formData)
-         const data = await addProduct(dataToSend)
-         setAllProducts((prev) => [...prev, data[0]])
-         setProducts((prev) => [...prev, data[0]])
+         const maxOrder = await getMaxOrderSellout()
+         const dataToSend = formatProductDates({
+            ...formData,
+            orderSellout: maxOrder + 1,
+         })
+
+         await addProduct(dataToSend)
          setIsModalOpen(false)
          setOpenDrawer(false)
+
          Sonner({
             message: 'Producto agregado correctamente',
             sonnerState: 'success',
@@ -301,7 +305,7 @@ export function useProductsProvider() {
             {
                event: '*',
                schema: 'public',
-               table: TABLE_NAME, 
+               table: TABLE_NAME,
             },
             (payload) => {
                const eventType = payload.eventType
