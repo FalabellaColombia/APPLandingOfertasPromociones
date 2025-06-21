@@ -1,8 +1,5 @@
 import type { Product, ProductForm, ProductToMove } from '@/types/product'
 import { useEffect, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { productFormSchema } from '@/lib/schemas/product.schema'
 import { VIEW_LISTADO } from '@/constants/views'
 import {
    addProduct,
@@ -25,8 +22,10 @@ import {
    updateVisibleOrderInAllProducts,
 } from '@/utils/product.utils'
 import Sonner from '@/components/Sonner'
-import supabase from '@/utils/supabase'
-import { TABLE_NAME } from '@/constants/tableName'
+import { useRealtimeSync } from './useRealtimeSync'
+import { useProductForm } from './useProductForm'
+import { Controller } from 'react-hook-form'
+import { isDirty } from 'zod'
 
 export function useProductsProvider() {
    const [allProducts, setAllProducts] = useState<Product[]>([])
@@ -49,7 +48,6 @@ export function useProductsProvider() {
       orderSellout: '0',
       title: '',
    })
-   const [formIsDirty, setFormIsDirty] = useState<boolean>(false)
    const [isSync, setIsSync] = useState<boolean>(false)
 
    const {
@@ -57,12 +55,10 @@ export function useProductsProvider() {
       handleSubmit,
       control,
       reset,
-      formState: { errors, isDirty },
-   } = useForm<ProductForm>({
-      resolver: zodResolver(productFormSchema),
-      mode: 'onChange',
-      defaultValues: getDefaultResetForm(),
-   })
+      errors,
+      formIsDirty,
+      setFormIsDirty,
+   } = useProductForm()
 
    useEffect(() => {
       const fetch = async () => {
@@ -78,10 +74,6 @@ export function useProductsProvider() {
       }
       fetch()
    }, [])
-
-   useEffect(() => {
-      setFormIsDirty(isDirty)
-   }, [isDirty])
 
    const onSubmitForm = (data: ProductForm) => {
       if (formEditingIsOpen) {
@@ -298,62 +290,7 @@ export function useProductsProvider() {
       }
    }
 
-   useEffect(() => {
-      const channel = supabase
-         .channel('products-realtime')
-         .on(
-            'postgres_changes',
-            {
-               event: '*',
-               schema: 'public',
-               table: TABLE_NAME,
-            },
-            (payload) => {
-               const eventType = payload.eventType
-               const newProduct = payload.new as Product
-               const oldProduct = payload.old as Product
-
-               setIsSync(true)
-
-               setTimeout(() => {
-                  setIsSync(false)
-               }, 1500)
-
-               setAllProducts((prev) => {
-                  let updated = [...prev]
-
-                  switch (eventType) {
-                     case 'INSERT':
-                        updated = [...prev, newProduct]
-                        break
-                     case 'UPDATE':
-                        updated = prev.map((p) =>
-                           p.id === newProduct.id ? newProduct : p
-                        )
-                        break
-                     case 'DELETE':
-                        updated = prev.filter((p) => p.id !== oldProduct.id)
-                        break
-                  }
-
-                  if (activeButton === VIEW_LISTADO) {
-                     const visibles = getVisibleProducts(updated)
-                     setProducts(visibles)
-                  } else {
-                     const ocultos = updated.filter((p) => p.isProductHidden)
-                     setProducts(ocultos)
-                  }
-
-                  return updated
-               })
-            }
-         )
-         .subscribe()
-
-      return () => {
-         supabase.removeChannel(channel)
-      }
-   }, [activeButton])
+   useRealtimeSync({ activeButton, setAllProducts, setProducts, setIsSync })
 
    return {
       allProducts,
