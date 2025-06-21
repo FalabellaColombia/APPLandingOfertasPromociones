@@ -204,9 +204,8 @@ export default function Form() {
                         {error && (
                            <p
                               className="text-red-400 mt-1 text-xs"
-                              role="alert"
-                              aria-live="polite">
-                              {errors.startDate && 'Esta fecha es obligatoria'}
+                              role="alert">
+                              {error.message}
                            </p>
                         )}
                      </>
@@ -253,9 +252,8 @@ export default function Form() {
                         {error && (
                            <p
                               className="text-red-400 mt-1 text-xs"
-                              role="alert"
-                              aria-live="polite">
-                              {errors.endDate && 'Esta fecha es obligatoria'}
+                              role="alert">
+                              {error.message}
                            </p>
                         )}
                      </>
