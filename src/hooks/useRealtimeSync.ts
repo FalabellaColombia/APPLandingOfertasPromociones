@@ -1,6 +1,6 @@
 // src/hooks/useRealtimeSync.ts
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { TABLE_NAME } from '@/constants/tableName'
 import supabase from '@/utils/supabase'
 import type { Product } from '@/types/product'
@@ -11,16 +11,15 @@ type UseRealtimeSyncProps = {
    activeButton: string
    setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>
    setProducts: React.Dispatch<React.SetStateAction<Product[]>>
-   setIsSync: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function useRealtimeSync({
    activeButton,
    setAllProducts,
    setProducts,
-   setIsSync,
 }: UseRealtimeSyncProps) {
-   
+   const [isSync, setIsSync] = useState<boolean>(false)
+
    useEffect(() => {
       const channel = supabase
          .channel('products-realtime')
@@ -78,4 +77,6 @@ export function useRealtimeSync({
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [activeButton])
+
+   return { isSync }
 }
