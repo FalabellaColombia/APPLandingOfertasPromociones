@@ -239,30 +239,35 @@ export function useProductActions({ reset }: UseProductActionsParams) {
    }
 
    return {
+      // General State
       isloadingButton,
-      setIsloadingButton,
-      handleAddProduct,
       isModalOpen,
-      openDrawer,
       setIsModalOpen,
+      openDrawer,
       setOpenDrawer,
-      handlePrepareEditForm,
-      handleEditProduct,
+      activeButton,
+      setActiveButton,
+
+      // Products
       allProducts,
       setAllProducts,
       products,
       setProducts,
+      productToMove,
+
+      // Edition
       formEditingIsOpen,
       setFormEditingIsOpen,
+      isFormOrderSelloutOpen,
+      setIsFormOrderSelloutOpen,
+
+      // Actions
+      handleAddProduct,
+      handleEditProduct,
+      handlePrepareEditForm,
       handleDeleteProduct,
-      activeButton,
-      setActiveButton,
       handleHideProduct,
       handleUnhideProduct,
       handleChangeOrderSelloutForm,
-      isFormOrderSelloutOpen,
-      setIsFormOrderSelloutOpen,
-      productToMove,
-      setInfoProductToMove,
    }
 }

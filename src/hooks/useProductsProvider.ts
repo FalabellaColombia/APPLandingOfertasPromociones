@@ -27,29 +27,36 @@ export function useProductsProvider() {
    } = useProductForm()
 
    const {
+      // General State
       isloadingButton,
-      handleAddProduct,
       isModalOpen,
-      openDrawer,
       setIsModalOpen,
+      openDrawer,
       setOpenDrawer,
-      handlePrepareEditForm,
-      handleEditProduct,
+      activeButton,
+      setActiveButton,
+
+      // Products
       allProducts,
       setAllProducts,
       products,
       setProducts,
+      productToMove,
+
+      // Edition
       formEditingIsOpen,
       setFormEditingIsOpen,
+      isFormOrderSelloutOpen,
+      setIsFormOrderSelloutOpen,
+
+      // Actions
+      handleAddProduct,
+      handleEditProduct,
+      handlePrepareEditForm,
       handleDeleteProduct,
-      activeButton,
-      setActiveButton,
       handleHideProduct,
       handleUnhideProduct,
       handleChangeOrderSelloutForm,
-      isFormOrderSelloutOpen,
-      setIsFormOrderSelloutOpen,
-      productToMove,
    } = useProductActions({ reset })
 
    useEffect(() => {
@@ -65,6 +72,7 @@ export function useProductsProvider() {
          }
       }
       fetch()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    const onSubmitForm = (data: ProductForm) => {
@@ -92,44 +100,54 @@ export function useProductsProvider() {
    })
 
    return {
+      // Data
       allProducts,
       setAllProducts,
       products,
       setProducts,
-      handleAddProduct,
-      handlePrepareEditForm,
-      handleEditProduct,
-      handleDeleteProduct,
-      handleHideProduct,
-      handleUnhideProduct,
+      pagination,
+      setPagination,
+      isLoading,
+      isSync,
+
+      // Form
       register,
       handleSubmit,
       Controller,
       control,
       onSubmitForm,
       reset,
-      isDirty,
-      setFormIsDirty,
       errors,
-      isLoading,
-      isloadingButton,
+      isDirty,
+      formEditingIsOpen,
+      setFormEditingIsOpen,
+      formIsDirty,
+      setFormIsDirty,
+      setIsFormOrderSelloutOpen,
+
+      // UI State
       isModalOpen,
       setIsModalOpen,
       openDrawer,
       setOpenDrawer,
-      handleBackdropDrawerClick,
-      formEditingIsOpen,
-      setFormEditingIsOpen,
       showConfirmDialog,
       setShowConfirmDialog,
+      isFormOrderSelloutOpen,
+      productToMove,
+
+      // Actions
+      handleAddProduct,
+      handlePrepareEditForm,
+      handleEditProduct,
+      handleDeleteProduct,
+      handleHideProduct,
+      handleUnhideProduct,
+      handleBackdropDrawerClick,
+      handleChangeOrderSelloutForm,
+
+      // View State
       activeButton,
       setActiveButton,
-      pagination,
-      setPagination,
-      isFormOrderSelloutOpen,
-      setIsFormOrderSelloutOpen,
-      productToMove,
-      handleChangeOrderSelloutForm,
-      isSync,
+      isloadingButton,
    }
 }
