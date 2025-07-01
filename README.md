@@ -7,6 +7,8 @@ App para gestionar los productos de la landing de ofertas y promociones de Falab
 -  React + TypeScript
 -  Vite - Construcción y desarrollo
 -  Supabase - Backend y base de datos
+-  Supabase Auth - Sistema de Autenticación
+-  Supabase Realtime - Sistema de suscripción a eventos en tiempo real mediante WebSockets
 -  ShadCN UI - Componentes visuales
 -  TanStack Table - Tabla interactiva
 -  React Hook Form + Zod - Formularios y validación
