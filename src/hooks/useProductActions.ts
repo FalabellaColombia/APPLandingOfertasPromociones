@@ -103,6 +103,11 @@ export function useProductActions({ reset }: UseProductActionsParams) {
                   p.id === idProductToEdit ? productUpdated[0] : p
                )
             )
+            setAllProducts((prev) =>
+               prev.map((p) =>
+                  p.id === idProductToEdit ? productUpdated[0] : p
+               )
+            )
             setFormEditingIsOpen(false)
             setOpenDrawer(false)
             reset(getDefaultResetForm())
@@ -130,6 +135,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
          await deleteProduct(id)
          const updateList = allProducts.filter((p) => p.id !== id)
          setAllProducts(updateList)
+         
          if (activeButton === VIEW_LISTADO) {
             const visibleProducts = getVisibleProducts(updateList)
             const orderedProducts = reorderOrderSellout(visibleProducts)
