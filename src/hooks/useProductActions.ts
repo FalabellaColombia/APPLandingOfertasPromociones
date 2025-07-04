@@ -49,8 +49,9 @@ export function useProductActions({ reset }: UseProductActionsParams) {
             ...formData,
             orderSellout: maxOrder + 1,
          })
-
-         await addProduct(dataToSend)
+         const insertedProduct = await addProduct(dataToSend)
+         setAllProducts((prev) => [...prev, insertedProduct])
+         setProducts((prev) => [...prev, insertedProduct])
          setIsModalOpen(false)
          setOpenDrawer(false)
 
@@ -135,7 +136,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
          await deleteProduct(id)
          const updateList = allProducts.filter((p) => p.id !== id)
          setAllProducts(updateList)
-         
+
          if (activeButton === VIEW_LISTADO) {
             const visibleProducts = getVisibleProducts(updateList)
             const orderedProducts = reorderOrderSellout(visibleProducts)

@@ -46,7 +46,9 @@ export function useRealtimeSync({
 
                   switch (eventType) {
                      case 'INSERT':
-                        updated = [...prev, newProduct]
+                        if (!prev.some((p) => p.id === newProduct.id)) {
+                           updated = [...prev, newProduct]
+                        }
                         break
                      case 'UPDATE':
                         updated = prev.map((p) =>

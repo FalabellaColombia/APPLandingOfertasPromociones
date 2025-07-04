@@ -13,8 +13,9 @@ export async function addProduct(product: ProductForm) {
       .from(TABLE_NAME)
       .insert([product])
       .select()
+      .single()
    if (error) throw error
-   return data || []
+   return data
 }
 
 export async function editProduct(
