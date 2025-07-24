@@ -1,1 +1,1 @@
-export const TABLE_NAME = 'cyber'
+export const TABLE_NAME = 'listProducts'

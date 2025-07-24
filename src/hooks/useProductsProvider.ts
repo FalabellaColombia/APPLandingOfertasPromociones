@@ -7,6 +7,7 @@ import { useProductForm } from './useProductForm'
 import { Controller } from 'react-hook-form'
 import { isDirty } from 'zod'
 import { useProductActions } from './useProductActions'
+import Sonner from '@/components/Sonner'
 
 export function useProductsProvider() {
    const [isLoading, setIsloading] = useState(true)
@@ -59,22 +60,34 @@ export function useProductsProvider() {
       handleChangeOrderSelloutForm,
    } = useProductActions({ reset })
 
-   useEffect(() => {
-      const fetch = async () => {
-         try {
-            const data = await getAllProducts()
-            setAllProducts(data)
-            setProducts(() => getVisibleProducts(data))
-         } catch (error) {
-            console.error('Error cargando los productos:', error)
-         } finally {
-            setIsloading(false)
-         }
+   const { isSync, setIsSync } = useRealtimeSync({
+      activeButton,
+      setAllProducts,
+      setProducts,
+   })
+
+   const syncProducts = async () => {
+      try {
+         setIsSync(true)
+         const data = await getAllProducts()
+         setAllProducts(data)
+         setProducts(() => getVisibleProducts(data))
+      } catch (error) {
+         console.error('Error cargando los productos:', error)
+         Sonner({
+            message: 'Error sincronizando. Intenta de nuevo',
+            sonnerState: 'error',
+         })
+      } finally {
+         setIsloading(false)
+         setIsSync(false)
       }
-      fetch()
+   }
+
+   useEffect(() => {
+      syncProducts()
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
-
    const onSubmitForm = (data: ProductForm) => {
       if (formEditingIsOpen) {
          handleEditProduct(data)
@@ -93,12 +106,6 @@ export function useProductsProvider() {
       }
    }
 
-   const { isSync } = useRealtimeSync({
-      activeButton,
-      setAllProducts,
-      setProducts,
-   })
-
    return {
       // Data
       allProducts,
@@ -109,6 +116,7 @@ export function useProductsProvider() {
       setPagination,
       isLoading,
       isSync,
+      syncProducts,
 
       // Form
       register,

@@ -1,5 +1,3 @@
-// src/hooks/useRealtimeSync.ts
-
 import { useEffect, useState } from 'react'
 import { TABLE_NAME } from '@/constants/tableName'
 import supabase from '@/utils/supabase'
@@ -31,47 +29,70 @@ export function useRealtimeSync({
                table: TABLE_NAME,
             },
             (payload) => {
-               const eventType = payload.eventType
-               const newProduct = payload.new as Product
-               const oldProduct = payload.old as Product
-
-               setIsSync(true)
-
-               setTimeout(() => {
-                  setIsSync(false)
-               }, 1500)
-
-               setAllProducts((prev) => {
-                  let updated = [...prev]
-
-                  switch (eventType) {
-                     case 'INSERT':
-                        if (!prev.some((p) => p.id === newProduct.id)) {
-                           updated = [...prev, newProduct]
-                        }
-                        break
-                     case 'UPDATE':
-                        updated = prev.map((p) =>
-                           p.id === newProduct.id ? newProduct : p
-                        )
-                        break
-                     case 'DELETE':
-                        updated = prev.filter((p) => p.id !== oldProduct.id)
-                        break
+               try {
+                  // Validación básica
+                  if (!payload?.eventType || (!payload?.new && !payload?.old)) {
+                     console.warn('Datos inválidos:', payload)
+                     return
                   }
 
-                  if (activeButton === VIEW_LISTADO) {
-                     const visibles = getVisibleProducts(updated)
-                     setProducts(visibles)
-                  } else {
-                     const ocultos = updated.filter((p) => p.isProductHidden)
-                     setProducts(ocultos)
-                  }
+                  const eventType = payload.eventType
+                  const newProduct = payload.new as Product
+                  const oldProduct = payload.old as Product
 
-                  return updated
-               })
+                  setIsSync(true)
+                  setTimeout(() => setIsSync(false), 1500)
+
+                  setAllProducts((prev) => {
+                     let updated = [...prev]
+
+                     switch (eventType) {
+                        case 'INSERT':
+                           if (
+                              newProduct?.id &&
+                              !prev.some((p) => p.id === newProduct.id)
+                           ) {
+                              updated = [...prev, newProduct]
+                           }
+                           break
+                        case 'UPDATE':
+                           if (newProduct?.id) {
+                              updated = prev.map((p) =>
+                                 p.id === newProduct.id ? newProduct : p
+                              )
+                           }
+                           break
+                        case 'DELETE':
+                           if (oldProduct?.id) {
+                              updated = prev.filter(
+                                 (p) => p.id !== oldProduct.id
+                              )
+                           }
+                           break
+                     }
+
+                     // Actualizar vista filtrada
+                     if (activeButton === VIEW_LISTADO) {
+                        const visibles = getVisibleProducts(updated)
+                        setProducts(visibles)
+                     } else {
+                        const ocultos = updated.filter((p) => p.isProductHidden)
+                        setProducts(ocultos)
+                     }
+
+                     return updated
+                  })
+               } catch (error) {
+                  console.error('Error en sync:', error)
+               }
             }
          )
+         .on('system', {}, (status) => {
+            if (status === 'CHANNEL_ERROR') {
+               console.error('Conexión perdida, recargando...')
+               setTimeout(() => window.location.reload(), 3000)
+            }
+         })
          .subscribe()
 
       return () => {
@@ -80,5 +101,5 @@ export function useRealtimeSync({
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [activeButton])
 
-   return { isSync }
+   return { isSync, setIsSync }
 }
