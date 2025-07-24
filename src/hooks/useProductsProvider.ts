@@ -8,6 +8,7 @@ import { Controller } from 'react-hook-form'
 import { isDirty } from 'zod'
 import { useProductActions } from './useProductActions'
 import Sonner from '@/components/Sonner'
+import { useSyncManager } from './useSyncManager'
 
 export function useProductsProvider() {
    const [isLoading, setIsloading] = useState(true)
@@ -16,6 +17,7 @@ export function useProductsProvider() {
       pageIndex: 0,
       pageSize: 25,
    })
+   const [isSync, setIsSync] = useState<boolean>(false)
 
    const {
       register,
@@ -60,12 +62,6 @@ export function useProductsProvider() {
       handleChangeOrderSelloutForm,
    } = useProductActions({ reset })
 
-   const { isSync, setIsSync } = useRealtimeSync({
-      activeButton,
-      setAllProducts,
-      setProducts,
-   })
-
    const syncProducts = async () => {
       try {
          setIsSync(true)
@@ -83,6 +79,21 @@ export function useProductsProvider() {
          setIsSync(false)
       }
    }
+   const { markRealtimeActive } = useSyncManager({
+      setAllProducts,
+      setProducts,
+      activeButton,
+      setIsSync,
+   })
+
+   useRealtimeSync({
+      activeButton,
+      setAllProducts,
+      setProducts,
+      markRealtimeActive,
+      setIsSync,
+      syncProducts,
+   })
 
    useEffect(() => {
       syncProducts()
