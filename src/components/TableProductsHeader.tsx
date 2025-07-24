@@ -15,6 +15,7 @@ import type { ColumnFilter, ColumnFiltersState } from '@tanstack/react-table'
 import { useFilters } from '@/hooks/useFilters'
 import FilterCategoryButton from './FilterCategoryButton'
 import CategoryBadges from "./CategoryBadges'"
+import { useTableConfig } from '@/hooks/useTableConfig'
 
 export default function TableProductsHeader({
    activeButton,
@@ -23,6 +24,7 @@ export default function TableProductsHeader({
    const { products, reset, setFormEditingIsOpen, setOpenDrawer, openDrawer } =
       useProducts()
    const { columnFilters, setColumnFilters } = useFilters()
+   const { setPagination } = useTableConfig()
 
    const handleAddProductClick = () => {
       const nextorderSellout = getNextorderSellout(products)
@@ -41,17 +43,19 @@ export default function TableProductsHeader({
             <div className="flex space-x-2.5">
                <Search
                   value={searchValue}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                     const newValue = e.target.value
+                     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+
                      setColumnFilters((prev: ColumnFiltersState) => {
                         const withoutTitle = prev.filter(
                            (f) => f.id !== 'title'
                         )
-                        const newValue = e.target.value
                         return newValue
                            ? [...withoutTitle, { id: 'title', value: newValue }]
                            : withoutTitle
                      })
-                  }
+                  }}
                />
                {searchValue !== '' && (
                   <Button

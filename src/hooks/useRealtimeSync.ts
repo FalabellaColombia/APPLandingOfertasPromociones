@@ -30,7 +30,6 @@ export function useRealtimeSync({
             },
             (payload) => {
                try {
-                  // Validación básica
                   if (!payload?.eventType || (!payload?.new && !payload?.old)) {
                      console.warn('Datos inválidos:', payload)
                      return
@@ -71,7 +70,6 @@ export function useRealtimeSync({
                            break
                      }
 
-                     // Actualizar vista filtrada
                      if (activeButton === VIEW_LISTADO) {
                         const visibles = getVisibleProducts(updated)
                         setProducts(visibles)
