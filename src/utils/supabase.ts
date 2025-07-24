@@ -2,15 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY!
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  realtime: import.meta.env.DEV
-    ? {
-        params: {
-          // Este endpoint es inválido y hará que falle la conexión WebSocket
-          broadcast: { endpoint: 'ws://localhost:1234/fail' }
-        }
-      }
-    : {}
-})
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default supabase
