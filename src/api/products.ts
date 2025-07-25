@@ -36,13 +36,6 @@ export async function deleteProduct(id: string) {
    if (error) throw error
 }
 
-export async function upsertProducts(products: Product[]) {
-   const { error } = await supabase
-      .from(TABLE_NAME)
-      .upsert(products, { onConflict: 'id' })
-   if (error) throw error
-}
-
 export async function hideProduct(id: string) {
    const { data, error } = await supabase
       .from(TABLE_NAME)
@@ -54,19 +47,6 @@ export async function hideProduct(id: string) {
       .select()
    if (error) throw error
    return data[0]
-}
-
-export async function getMaxOrderSellout(): Promise<number> {
-   const { data, error } = await supabase
-      .from(TABLE_NAME)
-      .select('orderSellout')
-      .not('isProductHidden', 'eq', true)
-      .order('orderSellout', { ascending: false })
-      .limit(1)
-
-   if (error) throw error
-
-   return data?.[0]?.orderSellout ?? 0
 }
 
 export async function unhideProduct(
@@ -84,4 +64,24 @@ export async function unhideProduct(
 
    if (error) throw error
    return data[0]
+}
+
+export async function upsertProducts(products: Product[]) {
+   const { error } = await supabase
+      .from(TABLE_NAME)
+      .upsert(products, { onConflict: 'id' })
+   if (error) throw error
+}
+
+export async function getMaxOrderSellout(): Promise<number> {
+   const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('orderSellout')
+      .not('isProductHidden', 'eq', true)
+      .order('orderSellout', { ascending: false })
+      .limit(1)
+
+   if (error) throw error
+
+   return data?.[0]?.orderSellout ?? 0
 }
