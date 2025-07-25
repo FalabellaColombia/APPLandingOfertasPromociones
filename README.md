@@ -88,6 +88,19 @@ En caso de que sea necesario desplegar nuevamente el proyecto, se pueden seguir 
 -  La configuración de Supabase ya está lista y vinculada con la aplicación.
 -  Las políticas de seguridad (RLS) están configuradas para permitir inserciones, lecturas, actualizaciones y eliminaciones según las reglas definidas.
 
+## Notas adicionales
+
+- Esta aplicación utiliza Supabase como backend (BaaS), por lo que no se exponen endpoints REST tradicionales. En su lugar, se utilizan funciones cliente proporcionadas por el SDK de Supabase, escritas en JavaScript, que internamente manejan las peticiones hacia la base de datos PostgreSQL.
+- Las funciones con esta lógica relacionada a operaciones CRUD, se encuentra en: `src/api/products.ts`.
+
+## Acceso a la aplicación
+
+Esta aplicación incluye autenticación de acceso y se encuentra actualmente en entorno productivo.
+
+**ADVERTENCIA:** El acceso se proporciona únicamente con fines de revisión interna. No realizar pruebas funcionales ni modificaciones en el entorno.
+
+Para solicitar las credenciales de acceso, por favor contactarme directamente por Microsoft Teams.
+
 ## Contribuciones
 
 Este proyecto fue creado y es mantenido por Jeison Garzón.
