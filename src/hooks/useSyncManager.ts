@@ -2,14 +2,7 @@ import { useEffect, useRef } from 'react'
 import { getAllProducts } from '@/api/products'
 import { getVisibleProducts } from '@/utils/product.utils'
 import { VIEW_LISTADO } from '@/constants/views'
-import type { Product } from '@/types/product'
-
-type useSyncManagerProps = {
-   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>
-   setProducts: React.Dispatch<React.SetStateAction<Product[]>>
-   activeButton: string
-   setIsSync: React.Dispatch<React.SetStateAction<boolean>>
-}
+import type { useSyncManagerProps } from '@/types/sync'
 
 export function useSyncManager({
    setAllProducts,

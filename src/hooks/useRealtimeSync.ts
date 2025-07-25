@@ -9,15 +9,7 @@ import type {
    RealtimeChannel,
    RealtimePostgresChangesPayload,
 } from '@supabase/supabase-js'
-
-type UseRealtimeSyncProps = {
-   activeButton: string
-   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>
-   setProducts: React.Dispatch<React.SetStateAction<Product[]>>
-   markRealtimeActive: () => void
-   setIsSync: React.Dispatch<React.SetStateAction<boolean>>
-   syncProducts: () => Promise<void>
-}
+import type { UseRealtimeSyncProps } from '@/types/sync'
 
 export function useRealtimeSync({
    activeButton,
