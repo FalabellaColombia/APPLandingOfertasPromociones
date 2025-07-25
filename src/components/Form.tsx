@@ -33,7 +33,6 @@ export default function Form() {
          <h3 className="mb-5 font-bold border-b-1 pb-3">
             {formEditingIsOpen ? 'Editar Producto' : 'Agregar Producto'}
          </h3>
-         {/* Orden Sellout */}
          <div className="*:not-first:mt-1 mb-3 w-full">
             <Label
                className="text-sm font-medium text-muted-foreground"
@@ -58,7 +57,6 @@ export default function Form() {
             )}
          </div>
 
-         {/* Categoría */}
          <div className="*:not-first:mt-1 mb-3 w-full">
             <Label className="text-sm font-medium" htmlFor="category">
                Categoría
@@ -93,7 +91,6 @@ export default function Form() {
             )}
          </div>
 
-         {/* Título */}
          <div className="*:not-first:mt-1 mb-3 w-full">
             <Label className="text-sm font-medium" htmlFor="title">
                Llamado
@@ -116,7 +113,6 @@ export default function Form() {
             )}
          </div>
 
-         {/* URL Producto */}
          <div className="*:not-first:mt-1 mb-3 w-full">
             <Label className="text-sm font-medium" htmlFor="urlProduct">
                URL
@@ -139,7 +135,6 @@ export default function Form() {
             )}
          </div>
 
-         {/* URL Imagen */}
          <div className="*:not-first:mt-1 mb-3 w-full">
             <Label className="text-sm font-medium" htmlFor="urlImage">
                URL Imagen
@@ -262,7 +257,6 @@ export default function Form() {
             </div>
          </div>
 
-         {/* Estado de la oferta */}
          <div className="*:not-first:mt-1 mb-5 w-full">
             <Label className="text-sm font-medium" htmlFor="offerState">
                Estado Oferta
