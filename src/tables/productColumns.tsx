@@ -9,6 +9,7 @@ export const columns: ColumnDef<Product>[] = [
       header: 'Orden Sellout',
       enableSorting: true,
       size: 120,
+      cell: ({ row }) => row.index + 1
    },
    {
       accessorKey: 'category',

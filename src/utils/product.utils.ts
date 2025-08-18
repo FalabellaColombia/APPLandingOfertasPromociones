@@ -1,6 +1,7 @@
 import type { Product, ProductForm } from '@/types/product'
 import { formatDateToISO } from './formatDate'
 import { parseDate } from '@internationalized/date'
+import { CalendarDate } from "@internationalized/date"
 
 export function getVisibleProducts(products: Product[]) {
    return products.filter((p) => !p.isProductHidden)
@@ -19,19 +20,23 @@ export function formatProductDates(formData: ProductForm) {
 }
 
 export function getNextorderSellout(products: Product[]): number {
-   if (products.length === 0) return 1
-   return Math.max(...products.map((p) => Number(p.orderSellout) || 0)) + 1
+      if (products.length === 0) return 1
+
+   const max = Math.max(...products.map((p) => Number(p.orderSellout) || 0))
+   const visual = Math.floor(max / 100)
+
+   return visual + 1
 }
 
 export function getDefaultAddProductForm(nextorderSellout: number) {
    return {
       orderSellout: String(nextorderSellout),
-      category: '',
-      title: '',
-      urlProduct: '',
-      urlImage: '',
-      startDate: undefined,
-      endDate: undefined,
+      category: 'Hogar',
+      title: 'asdasdsa',
+      urlProduct: 'https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s',
+      urlImage: 'https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s',
+      startDate : new CalendarDate(2025, 8, 1),
+      endDate : new CalendarDate(2025, 8, 31),
       offerState: '',
       isProductHidden: false,
    }

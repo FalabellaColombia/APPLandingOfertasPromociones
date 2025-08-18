@@ -3,7 +3,7 @@ import type { Product, ProductForm } from '@/types/product'
 import supabase from '@/utils/supabase'
 
 export async function getAllProducts(): Promise<Product[]> {
-   const { data, error } = await supabase.from(TABLE_NAME).select('*')
+   const { data, error } = await supabase.from(TABLE_NAME).select('*').order("orderSellout", { ascending: true }) 
    if (error) throw error
    return data || []
 }
@@ -83,5 +83,6 @@ export async function getMaxOrderSellout(): Promise<number> {
 
    if (error) throw error
 
-   return data?.[0]?.orderSellout ?? 0
+   const maxOrder = data?.[0]?.orderSellout ?? 0
+   return maxOrder + 100 
 }

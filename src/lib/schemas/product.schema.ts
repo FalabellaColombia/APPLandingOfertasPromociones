@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 export const productFormSchema = z
    .object({
-      orderSellout: z
-         .string()
-         .min(1, 'El orden sellout es obligatorio')
-         .max(3, 'Debe contener máximo 3 números')
-         .refine((val) => {
-            const num = Number(val)
-            return !isNaN(num) && num > 0 && Number.isInteger(num)
-         }, 'Debe ser un número entero positivo'),
+      orderSellout: z.string().optional(),
       category: z.string().min(1, 'La categoría es obligatoria'),
       title: z
          .string()

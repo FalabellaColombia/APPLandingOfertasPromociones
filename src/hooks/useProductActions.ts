@@ -47,7 +47,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
          const maxOrder = await getMaxOrderSellout()
          const dataToSend = formatProductDates({
             ...formData,
-            orderSellout: maxOrder + 1,
+            orderSellout: maxOrder,
          })
          const insertedProduct = await addProduct(dataToSend)
          setAllProducts((prev) => [...prev, insertedProduct])
