@@ -83,6 +83,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
    }
 
    const handleEditProduct = async (formData: ProductForm) => {
+      console.log(formData)
       if (!idProductToEdit) {
          Sonner({
             message: 'No hay producto seleccionado para editar',
@@ -93,6 +94,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
       setIsloadingButton(true)
       try {
          const dataToUpdate = formatProductDates(formData)
+         console.log(dataToUpdate)
          const productUpdated = await editProduct(dataToUpdate, idProductToEdit)
          if (productUpdated) {
             Sonner({

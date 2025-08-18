@@ -14,6 +14,7 @@ export function getHiddenProducts(products: Product[]) {
 export function formatProductDates(formData: ProductForm) {
    return {
       ...formData,
+      orderSellout: parseInt(formData.orderSellout) * 100,
       startDate: formatDateToISO(formData.startDate),
       endDate: formatDateToISO(formData.endDate),
    }
@@ -58,7 +59,7 @@ export function getDefaultResetForm() {
 
 export function getDefaultEditProductForm(product: Product) {
    return {
-      orderSellout: product.orderSellout?.toString() || '',
+      orderSellout: product.orderSellout ? (product.orderSellout / 100).toString() : '',
       category: product.category,
       title: product.title,
       urlProduct: product.urlProduct,
