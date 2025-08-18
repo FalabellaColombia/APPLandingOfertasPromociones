@@ -93,7 +93,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
       }
       setIsloadingButton(true)
       try {
-         const dataToUpdate = formatProductDates(formData)
+         const dataToUpdate = formatProductDates(formData, true)
          console.log(dataToUpdate)
          const productUpdated = await editProduct(dataToUpdate, idProductToEdit)
          if (productUpdated) {
