@@ -1,172 +1,167 @@
-import type { ProductForm } from '@/types/product'
-import { useEffect, useState } from 'react'
-import { getAllProducts } from '@/api/products'
-import { getVisibleProducts } from '@/utils/product.utils'
-import { useRealtimeSync } from './useRealtimeSync'
-import { useProductForm } from './useProductForm'
-import { Controller } from 'react-hook-form'
-import { isDirty } from 'zod'
-import { useProductActions } from './useProductActions'
-import Sonner from '@/components/Sonner'
-import { useSyncManager } from './useSyncManager'
+import { getAllProducts } from "@/api/products";
+import Sonner from "@/components/Sonner";
+import type { Product, ProductForm } from "@/types/product";
+import { formatProductDates, getVisibleProducts } from "@/utils/product.utils";
+import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
+import { isDirty } from "zod";
+import { useProductActions } from "./useProductActions";
+import { useProductForm } from "./useProductForm";
+import { useRealtimeSync } from "./useRealtimeSync";
+import { useSyncManager } from "./useSyncManager";
 
 export function useProductsProvider() {
-   const [isLoading, setIsloading] = useState(true)
-   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-   const [pagination, setPagination] = useState({
-      pageIndex: 0,
-      pageSize: 25,
-   })
-   const [isSync, setIsSync] = useState<boolean>(false)
+  const [isLoading, setIsloading] = useState(true);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 25
+  });
+  const [isSync, setIsSync] = useState<boolean>(false);
 
-   const {
-      register,
-      handleSubmit,
-      control,
-      reset,
-      errors,
-      formIsDirty,
-      setFormIsDirty,
-   } = useProductForm()
+  const { register, handleSubmit, control, reset, errors, formIsDirty, setFormIsDirty } = useProductForm();
 
-   const {
-      // General State
-      isloadingButton,
-      isModalOpen,
-      setIsModalOpen,
-      openDrawer,
-      setOpenDrawer,
-      activeButton,
-      setActiveButton,
+  const {
+    // General State
+    isloadingButton,
+    isModalOpen,
+    setIsModalOpen,
+    openDrawer,
+    setOpenDrawer,
+    activeButton,
+    setActiveButton,
 
-      // Products
-      allProducts,
-      setAllProducts,
-      products,
-      setProducts,
-      productToMove,
+    // Products
+    allProducts,
+    setAllProducts,
+    products,
+    setProducts,
+    productToMove,
 
-      // Edition
-      formEditingIsOpen,
-      setFormEditingIsOpen,
-      isFormOrderSelloutOpen,
-      setIsFormOrderSelloutOpen,
+    // Edition
+    formEditingIsOpen,
+    setFormEditingIsOpen,
+    isFormOrderSelloutOpen,
+    setIsFormOrderSelloutOpen,
 
-      // Actions
-      handleAddProduct,
-      handleEditProduct,
-      handlePrepareEditForm,
-      handleDeleteProduct,
-      handleHideProduct,
-      handleUnhideProduct,
-      handleChangeOrderSelloutForm,
-   } = useProductActions({ reset })
+    // Actions
+    handleAddProduct,
+    handleEditProduct,
+    handlePrepareEditForm,
+    handleDeleteProduct,
+    handleHideProduct,
+    handleUnhideProduct,
+    handlePrepareChangeOrderSelloutForm
+  } = useProductActions({ reset });
 
-   const syncProducts = async () => {
-      try {
-         setIsSync(true)
-         const data = await getAllProducts()
-         setAllProducts(data)
-         setProducts(() => getVisibleProducts(data))
-      } catch (error) {
-         console.error('Error cargando los productos:', error)
-         Sonner({
-            message: 'Error sincronizando. Intenta de nuevo',
-            sonnerState: 'error',
-         })
-      } finally {
-         setIsloading(false)
-         setIsSync(false)
-      }
-   }
-   const { markRealtimeActive } = useSyncManager({
-      setAllProducts,
-      setProducts,
-      activeButton,
-      setIsSync,
-   })
+  const syncProducts = async () => {
+    try {
+      setIsSync(true);
+      const data = await getAllProducts();
+      setAllProducts(data);
+      setProducts(() => getVisibleProducts(data));
+    } catch (error) {
+      console.error("Error cargando los productos:", error);
+      Sonner({
+        message: "Error sincronizando. Intenta de nuevo",
+        sonnerState: "error"
+      });
+    } finally {
+      setIsloading(false);
+      setIsSync(false);
+    }
+  };
+  const { markRealtimeActive } = useSyncManager({
+    setAllProducts,
+    setProducts,
+    activeButton,
+    setIsSync
+  });
 
-   useRealtimeSync({
-      activeButton,
-      setAllProducts,
-      setProducts,
-      markRealtimeActive,
-      setIsSync,
-      syncProducts,
-   })
+  useRealtimeSync({
+    activeButton,
+    setAllProducts,
+    setProducts,
+    markRealtimeActive,
+    setIsSync,
+    syncProducts
+  });
 
-   useEffect(() => {
-      syncProducts()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [])
-   const onSubmitForm = (data: ProductForm) => {
-      if (formEditingIsOpen) {
-         handleEditProduct(data)
-      } else {
-         handleAddProduct(data)
-      }
-   }
+  useEffect(() => {
+    syncProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-   const handleBackdropDrawerClick = () => {
-      if (formIsDirty) {
-         setShowConfirmDialog(true)
-      } else {
-         setOpenDrawer(false)
-         setFormIsDirty(false)
-         setIsFormOrderSelloutOpen(false)
-      }
-   }
+  const onSubmitForm = (data: ProductForm) => {
+    const payload: Product = formatProductDates(data);
 
-   return {
-      // Data
-      allProducts,
-      setAllProducts,
-      products,
-      setProducts,
-      pagination,
-      setPagination,
-      isLoading,
-      isSync,
-      syncProducts,
+    if (formEditingIsOpen) {
+      handleEditProduct(payload);
+    } else {
+      handleAddProduct(payload);
+    }
+  };
 
-      // Form
-      register,
-      handleSubmit,
-      Controller,
-      control,
-      onSubmitForm,
-      reset,
-      errors,
-      isDirty,
-      formEditingIsOpen,
-      setFormEditingIsOpen,
-      formIsDirty,
-      setFormIsDirty,
-      setIsFormOrderSelloutOpen,
+  const handleBackdropDrawerClick = () => {
+    if (formIsDirty) {
+      setShowConfirmDialog(true);
+    } else {
+      setOpenDrawer(false);
+      setFormIsDirty(false);
+      setIsFormOrderSelloutOpen(false);
+    }
+  };
 
-      // UI State
-      isModalOpen,
-      setIsModalOpen,
-      openDrawer,
-      setOpenDrawer,
-      showConfirmDialog,
-      setShowConfirmDialog,
-      isFormOrderSelloutOpen,
-      productToMove,
+  return {
+    // Data
+    allProducts,
+    setAllProducts,
+    products,
+    setProducts,
+    pagination,
+    setPagination,
+    isLoading,
+    isSync,
+    syncProducts,
 
-      // Actions
-      handleAddProduct,
-      handlePrepareEditForm,
-      handleEditProduct,
-      handleDeleteProduct,
-      handleHideProduct,
-      handleUnhideProduct,
-      handleBackdropDrawerClick,
-      handleChangeOrderSelloutForm,
+    // Form
+    register,
+    handleSubmit,
+    Controller,
+    control,
+    onSubmitForm,
+    reset,
+    errors,
+    isDirty,
+    formEditingIsOpen,
+    setFormEditingIsOpen,
+    formIsDirty,
+    setFormIsDirty,
+    setIsFormOrderSelloutOpen,
 
-      // View State
-      activeButton,
-      setActiveButton,
-      isloadingButton,
-   }
+    // UI State
+    isModalOpen,
+    setIsModalOpen,
+    openDrawer,
+    setOpenDrawer,
+    showConfirmDialog,
+    setShowConfirmDialog,
+    isFormOrderSelloutOpen,
+    productToMove,
+
+    // Actions
+    handleAddProduct,
+    handlePrepareEditForm,
+    handleEditProduct,
+    handleDeleteProduct,
+    handleHideProduct,
+    handleUnhideProduct,
+    handleBackdropDrawerClick,
+    handlePrepareChangeOrderSelloutForm,
+
+    // View State
+    activeButton,
+    setActiveButton,
+    isloadingButton
+  };
 }

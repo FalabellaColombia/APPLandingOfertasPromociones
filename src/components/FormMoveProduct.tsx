@@ -34,10 +34,7 @@ export default function FormMoveProduct() {
     formState: { errors, isDirty }
   } = useForm<ProductToMoveForm>({
     resolver: zodResolver(productToMoveSchema),
-    mode: "onChange",
-    defaultValues: {
-      neworderSellout: ""
-    }
+    mode: "onChange"
   });
 
   useEffect(() => {
@@ -46,7 +43,7 @@ export default function FormMoveProduct() {
 
   const onSubmitChangeOrderSellout = async (formData: ProductToMoveForm) => {
     const currentOrderSellout = products.findIndex((p) => p.id === productToMove.id) + 1;
-    const newOrderSellout = +formData.neworderSellout;
+    const newOrderSellout = formData.neworderSellout;
 
     const validationError = validateOrderChange(newOrderSellout, currentOrderSellout, products.length);
     if (validationError) {
@@ -93,18 +90,19 @@ export default function FormMoveProduct() {
     <form className="space-y-5" onSubmit={handleSubmit(onSubmitChangeOrderSellout)}>
       <h3 className="mb-5 font-bold border-b-1 pb-3">Cambiar Orden Sellout</h3>
       <p className="text-xs text-muted-foreground">
-        {Number(productToMove.orderSellout) / 100} - {productToMove.title}
+        {productToMove.orderSellout} - {productToMove.title}
       </p>
       <div className="*:not-first:mt-1 mb-3 w-full">
         <Label className="text-sm font-medium" htmlFor="neworderSellout">
           Nuevo Orden Sellout
         </Label>
         <Input
+          type="number"
           className="peer w-full"
           id="neworderSellout"
           placeholder="Ingresa el nuevo orden sellout"
           aria-invalid={!!errors.neworderSellout}
-          {...register("neworderSellout")}
+          {...register("neworderSellout", { valueAsNumber: true })}
         />
         {errors.neworderSellout && (
           <p className="peer-aria-invalid:text-destructive mt-2 text-xs" role="alert" aria-live="polite">

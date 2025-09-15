@@ -1,8 +1,8 @@
 import { editProduct, getAllProducts } from "@/api/products";
 import type { Product, ProductForm, ProductToMove, ProductToMoveForm } from "@/types/product";
 import { CalendarDate, parseDate } from "@internationalized/date";
-import { formatDateToISO } from "./formatDate";
 import supabase from "./supabase";
+import Sonner from "@/components/Sonner";
 
 const MIN_REBALANCE_VALUE = 2;
 
@@ -18,26 +18,12 @@ export function getHiddenProducts(products: Product[]) {
   return products.filter((p) => p.isProductHidden);
 }
 
-export function formatProductDates(formData: ProductForm, isEdit = false) {
-  if (!formData.orderSellout) {
-    throw new Error("El producto debe tener un ID para poder moverlo");
-  }
-
+export function formatProductDates(formData: ProductForm) {
   return {
     ...formData,
-    orderSellout: isEdit ? formData.orderSellout * 100 : formData.orderSellout,
-    startDate: formatDateToISO(formData.startDate),
-    endDate: formatDateToISO(formData.endDate)
+    startDate: formData.startDate.toString(),
+    endDate: formData.endDate.toString()
   };
-}
-
-export function getNextorderSellout(products: Product[]): number {
-  if (products.length === 0) return 1;
-
-  const max = Math.max(...products.map((p) => Number(p.orderSellout) || 0));
-  const visual = Math.floor(max / 100);
-
-  return visual + 1;
 }
 
 export function updateAllProducts(products: Product[], idProduct: string, product: Product): Product[] {
@@ -53,17 +39,17 @@ export function moveProductToEnd(products: Product[], idProduct: string, updated
 // UTILIDADES DE FORMULARIOS
 // ============================================================================
 
-export function getDefaultAddProductForm(nextorderSellout: number) {
+export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
-    orderSellout: String(nextorderSellout),
+    orderSellout: maxOrderSelloutUI,
     category: "Hogar",
     title: "asdasdsa",
     urlProduct:
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
     urlImage:
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
-    startDate: new CalendarDate(2025, 8, 1),
-    endDate: new CalendarDate(2025, 8, 31),
+    startDate: parseDate("2025-08-14"),
+    endDate: parseDate("2025-08-14"),
     offerState: "",
     isProductHidden: false
   };
@@ -76,37 +62,64 @@ export function getDefaultResetForm() {
     title: "",
     urlProduct: "",
     urlImage: "",
-    startDate: undefined,
-    endDate: undefined,
-    offerState: "",
+    startDate: null as unknown as CalendarDate,
+    endDate: null as unknown as CalendarDate,
+    offerState: null,
     isProductHidden: false
   };
 }
 
-export function getDefaultEditProductForm(product: Product) {
+export function getDefaultEditProductForm(product: ProductForm) {
   return {
-    orderSellout: product.orderSellout ? (product.orderSellout / 100).toString() : "",
-    category: product.category,
-    title: product.title,
-    urlProduct: product.urlProduct,
-    urlImage: product.urlImage,
-    startDate: product.startDate ? parseDate(product.startDate) : undefined,
-    endDate: product.endDate ? parseDate(product.endDate) : undefined,
+    orderSellout: product.orderSellout || 0,
+    category: product.category || "",
+    title: product.title || "",
+    urlProduct: product.urlProduct || "",
+    urlImage: product.urlImage || "",
+    startDate: product.startDate,
+    endDate: product.endDate,
     offerState: product.offerState,
-    isProductHidden: product.isProductHidden ?? false
+    isProductHidden: product.isProductHidden || false
   };
+}
+
+export function getChangedFields<T extends Record<string, unknown>>(originalData: T, newData: T): Partial<T> {
+  const changedFields: Partial<T> = {};
+
+  for (const key in newData) {
+    if (key === "orderSellout" || key === "id") continue;
+
+    if (originalData[key] !== newData[key]) {
+      changedFields[key] = newData[key];
+    }
+  }
+
+  return changedFields;
 }
 
 // ============================================================================
 // UTILIDADES DE ORDENAMIENTO Y REORDENAMIENTO
 // ============================================================================
 
-export const adjustOrderSellout = (products: Product[], targetPosition: string, productToMoveId: string): number => {
-  const targetIndex = Number(targetPosition) - 1;
+export function getMaxOrderSelloutForUI(products: Product[]): number {
+  if (products.length === 0) return 1;
 
-  const availableProducts = products.filter((product) => product.id !== productToMoveId);
+  const maxOrderSellout = Math.max(...products.map((p) => Number(p.orderSellout) || 0));
+  const positionIndex = Math.floor(maxOrderSellout / 100);
+  return positionIndex + 1;
+}
 
-  const sortedProducts = availableProducts.sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
+export function getOrderSelloutForUI(products: Product[], productId: string): number {
+  const sortedProducts = [...products].sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
+  const index = sortedProducts.findIndex((p) => p.id === productId);
+  const value = index !== -1 ? index + 1 : 1;
+  return value;
+}
+
+export const getNewProductPosition = (products: Product[], targetPosition: number, productToMoveId: string): number => {
+  const targetIndex = targetPosition - 1;
+  const otherProducts = products.filter((product) => product.id !== productToMoveId);
+  const sortedProducts = otherProducts.sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
 
   if (targetIndex <= 0) {
     if (sortedProducts.length === 0) {
@@ -210,22 +223,29 @@ export async function handleMassiveOrderChange(
   }
 
   try {
-    const currentProducts = await getAllProducts();
-    const visibleProducts = getVisibleProducts(currentProducts);
-    const newOrderValue = adjustOrderSellout(visibleProducts, newOrderSellout.toString(), productToMove.id);
+    const { error: rebalanceError } = await supabase.rpc("mass_rebalance_and_move_product", {
+      product_id_to_move: productToMove.id,
+      target_position: newOrderSellout
+    });
 
-    await editProduct({ orderSellout: newOrderValue }, productToMove.id);
-
-    const { error: rebalanceError } = await supabase.rpc("mass_rebalance_products");
-    if (rebalanceError) throw rebalanceError;
+    if (rebalanceError) {
+      console.error("Error en rebalanceo y movimiento:", rebalanceError);
+      Sonner({
+        message: "Hubo un error al cambiar el orden sellout. Intenta más tarde.",
+        sonnerState: "error"
+      });
+      throw new Error(`Error al rebalancear y mover el producto: ${rebalanceError.message || "Error desconocido"}`);
+    }
 
     const finalProducts = await getAllProducts();
     updateStates(finalProducts, setProducts, setAllProducts);
   } catch (error) {
     console.error(error);
-    throw error;
+    throw error instanceof Error ? error : new Error("Error inesperado al rebalancear productos");
   }
 }
+
+// -----
 
 export async function handleSimpleOrderChange(
   productToMoveId: string,
@@ -234,7 +254,7 @@ export async function handleSimpleOrderChange(
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>,
   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>
 ): Promise<void> {
-  const newOrderValue = adjustOrderSellout(products, String(formData.neworderSellout), productToMoveId);
+  const newOrderValue = getNewProductPosition(products, formData.neworderSellout, productToMoveId);
 
   await editProduct({ orderSellout: newOrderValue }, productToMoveId);
 

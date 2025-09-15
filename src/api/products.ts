@@ -1,35 +1,21 @@
 import { TABLE_NAME } from "@/constants/tableName";
-import type { Product, ProductForm } from "@/types/product";
+import type { Product } from "@/types/product";
 import supabase from "@/utils/supabase";
 
 export async function getAllProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .select("*")
-    .order("orderSellout", { ascending: true });
+  const { data, error } = await supabase.from(TABLE_NAME).select("*").order("orderSellout", { ascending: true });
   if (error) throw error;
   return data || [];
 }
 
-export async function addProduct(product: ProductForm) {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .insert([product])
-    .select()
-    .single();
+export async function addProduct(product: Product) {
+  const { data, error } = await supabase.from(TABLE_NAME).insert([product]).select().single();
   if (error) throw error;
   return data;
 }
 
-export async function editProduct(
-  dataToUpdate: Partial<ProductForm>,
-  editingProductId: string | null
-): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .update(dataToUpdate)
-    .eq("id", editingProductId)
-    .select();
+export async function editProduct(dataToUpdate: Partial<Product>, editingProductId: string): Promise<Product[]> {
+  const { data, error } = await supabase.from(TABLE_NAME).update(dataToUpdate).eq("id", editingProductId).select();
   if (error) throw error;
   return data;
 }
@@ -44,7 +30,7 @@ export async function hideProduct(id: string) {
     .from(TABLE_NAME)
     .update({
       isProductHidden: true,
-      orderSellout: null,
+      orderSellout: null
     })
     .eq("id", id)
     .select();
@@ -52,15 +38,12 @@ export async function hideProduct(id: string) {
   return data[0];
 }
 
-export async function unhideProduct(
-  maxOrderSellout: number,
-  id: string
-): Promise<Product> {
+export async function unhideProduct(maxOrderSellout: number, id: string): Promise<Product> {
   const { data, error } = await supabase
     .from(TABLE_NAME)
     .update({
       isProductHidden: false,
-      orderSellout: maxOrderSellout + 1,
+      orderSellout: maxOrderSellout + 1
     })
     .eq("id", id)
     .select();
@@ -70,9 +53,7 @@ export async function unhideProduct(
 }
 
 export async function upsertProducts(products: Product[]) {
-  const { error } = await supabase
-    .from(TABLE_NAME)
-    .upsert(products, { onConflict: "id" });
+  const { error } = await supabase.from(TABLE_NAME).upsert(products, { onConflict: "id" });
   if (error) throw error;
 }
 

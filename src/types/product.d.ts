@@ -11,13 +11,13 @@ export type Product = {
   urlImage: string;
   startDate: string;
   endDate: string;
-  offerState: string;
+  offerState: string | null;
   isProductHidden: boolean;
 };
 
 export type ProductToMove = {
   id?: string;
-  orderSellout: string;
+  orderSellout: number;
   title: string;
 };
 

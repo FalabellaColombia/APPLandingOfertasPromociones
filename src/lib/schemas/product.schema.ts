@@ -1,12 +1,9 @@
+import type { CalendarDate } from "@internationalized/date";
 import { z } from "zod";
 
 export const productFormSchema = z
   .object({
-    orderSellout: z
-      .string()
-      .optional()
-      .transform((val) => (val ? Number(val) : undefined))
-      .pipe(z.number().int().positive().optional()),
+    orderSellout: z.number(),
     category: z.string().min(1, "La categoría es obligatoria"),
     title: z.string().min(5, "El título es obligatorio").max(50, "Máximo 50 caracteres"),
     urlProduct: z
@@ -21,49 +18,23 @@ export const productFormSchema = z
       .refine((url) => url.startsWith("http"), {
         message: "La URL debe comenzar con http o https"
       }),
-    startDate: z.preprocess(
-      (arg) => {
-        if (!arg) return undefined;
-        return arg instanceof Date ? arg : new Date(arg as string);
-      },
-      z
-        .date({
-          required_error: "La fecha inicio es obligatoria",
-          invalid_type_error: "La fecha debe ser válida"
-        })
-        .refine((date) => !isNaN(date.getTime()), {
-          message: "La fecha debe ser válida"
-        })
-    ),
-    endDate: z.preprocess(
-      (arg) => {
-        if (!arg) return undefined;
-        return arg instanceof Date ? arg : new Date(arg as string);
-      },
-      z
-        .date({
-          required_error: "La fecha fin es obligatoria",
-          invalid_type_error: "La fecha debe ser válida"
-        })
-        .refine((date) => !isNaN(date.getTime()), {
-          message: "La fecha debe ser válida"
-        })
-    ),
-    offerState: z.string().nullable().optional(),
-    isProductHidden: z.boolean().optional()
+    startDate: z.custom<CalendarDate>((val) => !!val, "La fecha es requerida"),
+    endDate: z.custom<CalendarDate>((val) => !!val, "La fecha es requerida"),
+    offerState: z.string().nullable(),
+    isProductHidden: z.boolean()
   })
-  .refine((data) => data.startDate.toDateString() !== data.endDate.toDateString(), {
+  .refine((data) => data.startDate.toString() !== data.endDate.toString(), {
     message: "La fecha de inicio y fin no pueden ser el mismo día",
     path: ["endDate"]
   });
 
 export const productToMoveSchema = z.object({
   neworderSellout: z
-    .string()
-    .min(1, "El orden sellout es obligatorio")
-    .max(3, "Debe contener máximo 3 números")
-    .refine((val) => {
-      const num = Number(val);
-      return !isNaN(num) && num > 0 && Number.isInteger(num);
-    }, "Debe ser un número entero positivo")
+    .number({
+      required_error: "El orden sellout es obligatorio",
+      invalid_type_error: "Debe ser un número"
+    })
+    .int("Debe ser un número entero")
+    .positive("Debe ser un número positivo")
+    .max(999, "Debe contener máximo 3 números")
 });

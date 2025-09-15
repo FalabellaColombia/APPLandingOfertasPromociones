@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar-rac'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { SelectNative } from './ui/select-native'
 import { useProducts } from '@/hooks/useProducts'
 import { CalendarIcon } from 'lucide-react'
 import {
@@ -12,9 +12,9 @@ import {
    Label as LabelAria,
    Popover,
 } from 'react-aria-components'
-import { DateInput } from './ui/datefield-rac'
-import { Calendar } from '@/components/ui/calendar-rac'
 import { Loader } from './Loader'
+import { DateInput } from './ui/datefield-rac'
+import { SelectNative } from './ui/select-native'
 
 export default function Form() {
    const {
@@ -40,12 +40,13 @@ export default function Form() {
                Orden Sellout
             </Label>
             <Input
+            type='number'
                disabled
                className="peer w-full text-muted-foreground"
                id="orderSellout"
                placeholder="Ingresa el orden sellout"
                aria-invalid={!!errors.orderSellout}
-               {...register('orderSellout')}
+               {...register("orderSellout", { valueAsNumber: true })}
             />
             {errors.orderSellout && (
                <p
