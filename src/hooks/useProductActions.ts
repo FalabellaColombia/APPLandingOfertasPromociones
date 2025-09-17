@@ -39,27 +39,8 @@ export function useProductActions() {
       const dataToSend = { ...formData, orderSellout: maxOrderSellout };
       const addedProduct = await addProduct(dataToSend);
 
-      setAllProducts((prevProducts) => {
-        console.log("🚨 ESTADO CORRUPTO DETECTADO:", {
-          prevProducts,
-          tipo: typeof prevProducts,
-          esArray: Array.isArray(prevProducts),
-          esUndefined: prevProducts === undefined,
-          esNull: prevProducts === null
-        });
-
-        if (prevProducts === undefined) {
-          console.trace("🔍 STACK TRACE del undefined:");
-        }
-
-        const safeProducts = Array.isArray(prevProducts) ? prevProducts : [];
-        return [...safeProducts, addedProduct];
-      });
-
-      setDisplayedProducts((prevProducts) => {
-        const safeProducts = Array.isArray(prevProducts) ? prevProducts : [];
-        return [...safeProducts, addedProduct];
-      });
+      setAllProducts((prevProducts) => [...prevProducts, addedProduct]);
+      setDisplayedProducts((prevProducts) => [...prevProducts, addedProduct]);
 
       setIsModalOpen(false);
       setIsDrawerOpen(false);

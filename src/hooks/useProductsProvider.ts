@@ -92,7 +92,10 @@ export function useProductsProvider() {
   }, []);
 
   const onSubmitForm = (data: ProductForm) => {
-    const payload: Product = formatProductDates(data);
+    const payload: Product = formatProductDates({
+      ...data,
+      offerState: data.offerState || null
+    });
 
     if (isFormEditingOpen) {
       handleEditProduct(payload);
