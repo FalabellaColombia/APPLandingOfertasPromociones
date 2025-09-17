@@ -1,62 +1,61 @@
-import { columns } from '@/tables/productColumns'
+import { columns } from "@/tables/productColumns";
 import {
-   type SortingState,
-   useReactTable,
-   getCoreRowModel,
-   getFilteredRowModel,
-   getSortedRowModel,
-   getPaginationRowModel,
-} from '@tanstack/react-table'
-import { useState } from 'react'
-import { useProducts } from './useProducts'
-import { useFilters } from './useFilters'
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable
+} from "@tanstack/react-table";
+import { useState } from "react";
+import { useFilters } from "./useFilters";
+import { useProducts } from "./useProducts";
 
 export function useTableConfig() {
-   const { columnFilters, setColumnFilters } = useFilters()
-   const [sorting, setSorting] = useState<SortingState>([
-      { id: 'orderSellout', desc: false },
-   ])
+  const { columnFilters, setColumnFilters } = useFilters();
+  const [sorting, setSorting] = useState<SortingState>([]);
+  //const [sorting, setSorting] = useState<SortingState>([{ id: "orderSellout", desc: false }]);
 
-   const {
+  const {
+    pagination,
+    setPagination,
+    displayedProducts,
+    isLoading,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    currentView,
+    isFormOrderSelloutOpen
+  } = useProducts();
+
+  const table = useReactTable({
+    data: displayedProducts,
+    columns: columns,
+    state: {
       pagination,
-      setPagination,
-      products,
-      isLoading,
-      openDrawer,
-      setOpenDrawer,
-      activeButton,
-      isFormOrderSelloutOpen,
-   } = useProducts()
-
-   const table = useReactTable({
-      data: products,
-      columns: columns,
-      state: {
-         pagination,
-         columnFilters,
-         sorting,
-      },
-      onColumnFiltersChange: setColumnFilters,
-      onSortingChange: setSorting,
-      getCoreRowModel: getCoreRowModel(),
-      getFilteredRowModel: getFilteredRowModel(),
-      getSortedRowModel: getSortedRowModel(),
-      getPaginationRowModel: getPaginationRowModel(),
-   })
-
-   return {
-      table,
-      isLoading,
-      openDrawer,
-      setOpenDrawer,
-      activeButton,
-      isFormOrderSelloutOpen,
-      pagination,
-      setPagination,
       columnFilters,
-      setColumnFilters,
-      sorting,
-      setSorting,
-      products,
-   }
+      sorting
+    },
+    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  });
+
+  return {
+    table,
+    isLoading,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    currentView,
+    isFormOrderSelloutOpen,
+    pagination,
+    setPagination,
+    columnFilters,
+    setColumnFilters,
+    sorting,
+    setSorting,
+    displayedProducts
+  };
 }

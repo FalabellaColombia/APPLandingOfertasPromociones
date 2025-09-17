@@ -1,4 +1,4 @@
-import { VIEW_LISTADO } from "@/constants/views";
+import { VIEW_VISIBLEPRODUCTS } from "@/constants/views";
 import { useFilters } from "@/hooks/useFilters";
 import { useProducts } from "@/hooks/useProducts";
 import { useTableConfig } from "@/hooks/useTableConfig";
@@ -14,17 +14,17 @@ import FormMoveProduct from "./FormMoveProduct";
 import Search from "./Search";
 import { Button } from "./ui/button";
 
-export default function TableProductsHeader({ activeButton, isFormOrderSelloutOpen }: TableHeader) {
-  const { products, reset, setFormEditingIsOpen, setOpenDrawer, openDrawer } = useProducts();
+export default function TableProductsHeader({ currentView, isFormOrderSelloutOpen }: TableHeader) {
+  const { displayedProducts, reset, setIsFormEditingOpen, setIsDrawerOpen, isDrawerOpen } = useProducts();
   const { columnFilters, setColumnFilters } = useFilters();
   const { setPagination } = useTableConfig();
 
   const handlePrepareAddProductForm = () => {
-    const maxOrderSelloutUI = getMaxOrderSelloutForUI(products);
-    
+    const maxOrderSelloutUI = getMaxOrderSelloutForUI(displayedProducts);
+
     reset(getDefaultAddProductForm(maxOrderSelloutUI));
-    setOpenDrawer(true);
-    setFormEditingIsOpen(false);
+    setIsDrawerOpen(true);
+    setIsFormEditingOpen(false);
   };
 
   const searchValue = (columnFilters.find((f: ColumnFilter) => f.id === "title")?.value as string) ?? "";
@@ -56,7 +56,7 @@ export default function TableProductsHeader({ activeButton, isFormOrderSelloutOp
         </div>
 
         <div className="flex gap-2 m-0">
-          {activeButton === VIEW_LISTADO && (
+          {currentView === VIEW_VISIBLEPRODUCTS && (
             <Button className="aspect-square max-sm:p-0 m-0" onClick={handlePrepareAddProductForm}>
               <PlusIcon className="opacity-60 sm:-ms-1" size={16} aria-hidden="true" />
               <span className="max-sm:sr-only">Agregar Producto</span>
@@ -66,7 +66,7 @@ export default function TableProductsHeader({ activeButton, isFormOrderSelloutOp
           <FilterCategoryButton />
         </div>
 
-        <Drawer isOpen={openDrawer} onClose={() => setOpenDrawer(false)}>
+        <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           {isFormOrderSelloutOpen ? <FormMoveProduct /> : <Form />}
         </Drawer>
       </div>

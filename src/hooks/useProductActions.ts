@@ -1,139 +1,131 @@
-import {
-  addProduct,
-  deleteProduct,
-  editProduct,
-  getMaxOrderSellout,
-  hideProduct,
-  unhideProduct,
-  upsertProducts
-} from "@/api/products";
+import { addProduct, deleteProduct, editProduct, getMaxOrderSellout, hideProduct, unhideProduct } from "@/api/products";
 import Sonner from "@/components/Sonner";
-import { VIEW_LISTADO } from "@/constants/views";
+import { VIEW_VISIBLEPRODUCTS, type ProductView } from "@/constants/views";
 import type { Product, ProductForm, ProductToMove } from "@/types/product";
-import { isPostgresError } from "@/utils/errorHelpers";
 import {
   getChangedFields,
   getDefaultEditProductForm,
   getDefaultResetForm,
-  getOrderSelloutForUI,
-  getVisibleProducts,
-  moveProductToEnd,
-  reorderOrderSellout,
-  updateVisibleOrderInAllProducts
+  getProductPosition,
+  getVisibleProducts
 } from "@/utils/product.utils";
 import { parseDate } from "@internationalized/date";
 import { useState } from "react";
+import { useProductForm } from "./useProductForm";
 
-type UseProductActionsParams = {
-  reset: (values?: ProductForm) => void;
-};
-
-export function useProductActions({ reset }: UseProductActionsParams) {
-  const [isloadingButton, setIsloadingButton] = useState(false);
+export function useProductActions() {
+  const { reset } = useProductForm();
+  const [isFormButtonLoading, setIsFormButtonLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [idProductToEdit, setIdProductToEdit] = useState<string | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [formEditingIsOpen, setFormEditingIsOpen] = useState(false);
-  const [activeButton, setActiveButton] = useState<string>(VIEW_LISTADO);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isFormEditingOpen, setIsFormEditingOpen] = useState(false);
   const [isFormOrderSelloutOpen, setIsFormOrderSelloutOpen] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  const [currentView, setCurrentView] = useState<ProductView>(VIEW_VISIBLEPRODUCTS);
+  const [originalProductData, setOriginalProductData] = useState<Product | null>(null);
+  const [productIdToEdit, setProductIdToEdit] = useState<string | null>(null);
   const [productToMove, setProductToMove] = useState<ProductToMove>({
     id: "",
     orderSellout: 0,
     title: ""
   });
-  const [originalProductData, setOriginalProductData] = useState<Product | null>(null);
 
   const handleAddProduct = async (formData: Product) => {
-    setIsloadingButton(true);
+    setIsFormButtonLoading(true);
+
     try {
       const maxOrderSellout = await getMaxOrderSellout();
       const dataToSend = { ...formData, orderSellout: maxOrderSellout };
-
       const addedProduct = await addProduct(dataToSend);
-      setAllProducts((prev) => [...prev, addedProduct]);
-      setProducts((prev) => [...prev, addedProduct]);
+
+      setAllProducts((prevProducts) => {
+        console.log("🚨 ESTADO CORRUPTO DETECTADO:", {
+          prevProducts,
+          tipo: typeof prevProducts,
+          esArray: Array.isArray(prevProducts),
+          esUndefined: prevProducts === undefined,
+          esNull: prevProducts === null
+        });
+
+        if (prevProducts === undefined) {
+          console.trace("🔍 STACK TRACE del undefined:");
+        }
+
+        const safeProducts = Array.isArray(prevProducts) ? prevProducts : [];
+        return [...safeProducts, addedProduct];
+      });
+
+      setDisplayedProducts((prevProducts) => {
+        const safeProducts = Array.isArray(prevProducts) ? prevProducts : [];
+        return [...safeProducts, addedProduct];
+      });
+
       setIsModalOpen(false);
-      setOpenDrawer(false);
+      setIsDrawerOpen(false);
 
       Sonner({
         message: "Producto agregado correctamente",
         sonnerState: "success"
       });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        if (isPostgresError(error) && error.code === "23505") {
-          Sonner({
-            message: "Este orden sellout ya existe en la lista",
-            sonnerState: "error"
-          });
-        }
-      } else {
-        console.error("Error desconocido", error);
-      }
+    } catch (error) {
+      console.error(error);
     } finally {
-      setIsloadingButton(false);
+      setIsFormButtonLoading(false);
     }
   };
 
   const handlePrepareEditForm = (product: Product) => {
-    setFormEditingIsOpen(true);
-    setIdProductToEdit(product.id || null);
-
+    setIsFormEditingOpen(true);
+    setProductIdToEdit(product.id || null);
     setOriginalProductData(product);
 
     if (!product.id) return;
 
     const formData: ProductForm = {
       ...product,
-      orderSellout: getOrderSelloutForUI(products, product.id),
+      orderSellout: getProductPosition(displayedProducts, product.id),
       startDate: parseDate(product.startDate),
       endDate: parseDate(product.endDate)
     };
 
     reset(getDefaultEditProductForm(formData));
-    setOpenDrawer(true);
+    setIsDrawerOpen(true);
   };
 
   const handleEditProduct = async (formData: Product) => {
-    if (!idProductToEdit || !originalProductData) {
+    if (!productIdToEdit || !originalProductData) {
       Sonner({
-        message: "No hay producto seleccionado para editar",
+        message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
         sonnerState: "error"
       });
       return;
     }
-
-    setIsloadingButton(true);
-
+    setIsFormButtonLoading(true);
     try {
       const changedFields = getChangedFields(originalProductData, formData);
-
       if (Object.keys(changedFields).length === 0) {
         Sonner({
           message: "No se detectaron cambios",
           sonnerState: "warning"
         });
-        setIsloadingButton(false);
+        setIsFormButtonLoading(false);
         return;
       }
-
-      const productUpdated = await editProduct(changedFields, idProductToEdit);
-
+      const productUpdated = await editProduct(changedFields, productIdToEdit);
       if (productUpdated) {
         Sonner({
           message: "Producto actualizado correctamente",
           sonnerState: "success"
         });
 
-        setProducts((prev) => prev.map((p) => (p.id === idProductToEdit ? productUpdated[0] : p)));
-        setAllProducts((prev) => prev.map((p) => (p.id === idProductToEdit ? productUpdated[0] : p)));
+        setAllProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
+        setDisplayedProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
 
-        setFormEditingIsOpen(false);
-        setOpenDrawer(false);
+        setIsFormEditingOpen(false);
+        setIsDrawerOpen(false);
         reset(getDefaultResetForm());
-        setIdProductToEdit(null);
+        setProductIdToEdit(null);
         setOriginalProductData(null);
       }
     } catch (error) {
@@ -143,33 +135,28 @@ export function useProductActions({ reset }: UseProductActionsParams) {
       });
       console.error(error);
     } finally {
-      setIsloadingButton(false);
+      setIsFormButtonLoading(false);
     }
   };
 
   const handleDeleteProduct = async (productInfo: Product) => {
     const id = productInfo.id;
     if (!id) {
-      Sonner({ message: "ID inválido", sonnerState: "error" });
+      Sonner({
+        message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
+        sonnerState: "error"
+      });
       return;
     }
 
     try {
       await deleteProduct(id);
-      const updateList = allProducts.filter((p) => p.id !== id);
-      setAllProducts(updateList);
+      const updatedAllProducts = allProducts.filter((p) => p.id !== id);
+      setAllProducts(updatedAllProducts);
 
-      if (activeButton === VIEW_LISTADO) {
-        const visibleProducts = getVisibleProducts(updateList);
-        const orderedProducts = reorderOrderSellout(visibleProducts);
-        const fullyUpdatedList = updateVisibleOrderInAllProducts(updateList, orderedProducts);
-        setAllProducts(fullyUpdatedList);
-        await upsertProducts(orderedProducts);
-        setProducts(orderedProducts);
-      } else {
-        const hiddenProducts = updateList.filter((p) => p.isProductHidden);
-        setProducts(hiddenProducts);
-      }
+      const updatedProducts = displayedProducts.filter((p) => p.id !== id);
+      setDisplayedProducts(updatedProducts);
+
       Sonner({
         message: "Producto eliminado correctamente",
         sonnerState: "success"
@@ -187,22 +174,18 @@ export function useProductActions({ reset }: UseProductActionsParams) {
     const id = product.id;
     if (!id) {
       Sonner({
-        message: "No hay producto seleccionado para ocultar",
+        message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
         sonnerState: "error"
       });
       return;
     }
-
     try {
       const hiddenProduct = await hideProduct(id);
       const updatedList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
       const visibleProducts = getVisibleProducts(updatedList);
-      const orderedProducts = reorderOrderSellout(visibleProducts);
-      const fullyUpdatedList = updateVisibleOrderInAllProducts(updatedList, orderedProducts);
-      await upsertProducts(orderedProducts);
-      setAllProducts(fullyUpdatedList);
-      setProducts(orderedProducts);
 
+      setAllProducts(updatedList);
+      setDisplayedProducts(visibleProducts);
       Sonner({
         message: "Producto ocultado correctamente",
         sonnerState: "success"
@@ -220,7 +203,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
     const { id } = product;
     if (!id) {
       Sonner({
-        message: "No hay producto seleccionado para desocultar",
+        message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
         sonnerState: "error"
       });
       return;
@@ -228,13 +211,15 @@ export function useProductActions({ reset }: UseProductActionsParams) {
 
     try {
       const maxOrderSellout = await getMaxOrderSellout();
-      const unhiddenProduct = await unhideProduct(+maxOrderSellout, id);
-      const updatedList = moveProductToEnd(allProducts, id, unhiddenProduct);
-      const visibles = getVisibleProducts(updatedList);
+      const unhiddenProduct = await unhideProduct(maxOrderSellout, id);
 
-      setAllProducts(updatedList);
-      setProducts(visibles);
-      setActiveButton(VIEW_LISTADO);
+      const updatedList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
+      const sortedList = updatedList.sort((a, b) => a.orderSellout - b.orderSellout);
+      const visibleProducts = getVisibleProducts(sortedList);
+
+      setAllProducts(sortedList);
+      setDisplayedProducts(visibleProducts);
+      setCurrentView(VIEW_VISIBLEPRODUCTS);
 
       Sonner({
         message: "Producto desocultado correctamente",
@@ -252,10 +237,8 @@ export function useProductActions({ reset }: UseProductActionsParams) {
   const handlePrepareChangeOrderSelloutForm = (productInfo: ProductToMove) => {
     const productId = productInfo.id;
     if (!productId) return;
-
-    const OrderSelloutForUI = getOrderSelloutForUI(products, productId);
-
-    setOpenDrawer(true);
+    const OrderSelloutForUI = getProductPosition(displayedProducts, productId);
+    setIsDrawerOpen(true);
     setIsFormOrderSelloutOpen(true);
     setProductToMove({
       id: productId,
@@ -266,24 +249,24 @@ export function useProductActions({ reset }: UseProductActionsParams) {
 
   return {
     // General State
-    isloadingButton,
+    isFormButtonLoading,
     isModalOpen,
     setIsModalOpen,
-    openDrawer,
-    setOpenDrawer,
-    activeButton,
-    setActiveButton,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    currentView,
+    setCurrentView,
 
     // Products
     allProducts,
     setAllProducts,
-    products,
-    setProducts,
+    displayedProducts,
+    setDisplayedProducts,
     productToMove,
 
     // Edition
-    formEditingIsOpen,
-    setFormEditingIsOpen,
+    isFormEditingOpen,
+    setIsFormEditingOpen,
     isFormOrderSelloutOpen,
     setIsFormOrderSelloutOpen,
 

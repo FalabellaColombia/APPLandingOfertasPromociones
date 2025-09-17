@@ -43,18 +43,13 @@ export async function unhideProduct(maxOrderSellout: number, id: string): Promis
     .from(TABLE_NAME)
     .update({
       isProductHidden: false,
-      orderSellout: maxOrderSellout + 1
+      orderSellout: maxOrderSellout
     })
     .eq("id", id)
     .select();
 
   if (error) throw error;
   return data[0];
-}
-
-export async function upsertProducts(products: Product[]) {
-  const { error } = await supabase.from(TABLE_NAME).upsert(products, { onConflict: "id" });
-  if (error) throw error;
 }
 
 export async function getMaxOrderSellout(): Promise<number> {
@@ -69,4 +64,11 @@ export async function getMaxOrderSellout(): Promise<number> {
 
   const maxOrder = data?.[0]?.orderSellout ?? 0;
   return maxOrder + 100;
+}
+
+export async function massRebalanceAndMoveProduct(productId: string, targetPosition: number) {
+  return await supabase.rpc("mass_rebalance_and_move_product", {
+    product_id_to_move: productId,
+    target_position: targetPosition
+  });
 }

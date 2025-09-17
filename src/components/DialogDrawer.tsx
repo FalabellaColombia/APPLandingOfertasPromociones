@@ -13,11 +13,11 @@ import {
 import { useProducts } from "@/hooks/useProducts";
 
 export default function DialogDrawer() {
-  const { setOpenDrawer, showConfirmDialog, setShowConfirmDialog, setIsFormOrderSelloutOpen } = useProducts();
+  const { setIsDrawerOpen, showConfirmDialog, setShowConfirmDialog, setIsFormOrderSelloutOpen } = useProducts();
 
   const handleConfirm = () => {
     setShowConfirmDialog(false);
-    setOpenDrawer(false);
+    setIsDrawerOpen(false);
     setIsFormOrderSelloutOpen(false);
   };
 

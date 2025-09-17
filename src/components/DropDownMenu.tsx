@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { VIEW_LISTADO } from "@/constants/views";
+import { VIEW_VISIBLEPRODUCTS } from "@/constants/views";
 import { useProducts } from "@/hooks/useProducts";
 import type { Product } from "@/types/product";
 import { EllipsisIcon } from "lucide-react";
@@ -30,7 +30,7 @@ export default function DropDownMenu({ productInfo }: Props) {
     handleDeleteProduct,
     handlePrepareEditForm,
     handleHideProduct,
-    activeButton,
+    currentView,
     handleUnhideProduct,
     handlePrepareChangeOrderSelloutForm
   } = useProducts();
@@ -50,7 +50,7 @@ export default function DropDownMenu({ productInfo }: Props) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {activeButton === VIEW_LISTADO ? (
+        {currentView === VIEW_VISIBLEPRODUCTS ? (
           <>
             <DropdownMenuItem onClick={() => handlePrepareEditForm(productInfo)}>Editar</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handlePrepareChangeOrderSelloutForm(productInfo)}>Mover</DropdownMenuItem>

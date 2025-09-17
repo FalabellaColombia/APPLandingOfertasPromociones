@@ -1,4 +1,4 @@
-import type { productFormSchema, productToMoveSchema } from "@/lib/schemas/product.schema";
+import type { productFormSchema, productToMoveFormSchema } from "@/lib/schemas/product.schema";
 import type { z } from "zod";
 
 // Tipos estáticos
@@ -23,4 +23,4 @@ export type ProductToMove = {
 
 // Tipos derivados de los schemas de Zod (ligados a validaciones en tiempo de ejecución)
 export type ProductForm = z.infer<typeof productFormSchema>;
-export type ProductToMoveForm = z.infer<typeof productToMoveSchema>;
+export type ProductToMoveForm = z.infer<typeof productToMoveFormSchema>;

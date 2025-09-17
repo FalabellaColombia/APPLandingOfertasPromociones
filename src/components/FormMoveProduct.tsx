@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProducts } from "@/hooks/useProducts";
-import { productToMoveSchema } from "@/lib/schemas/product.schema";
+import { productToMoveFormSchema } from "@/lib/schemas/product.schema";
 import type { ProductToMoveForm } from "@/types/product";
 import {
-  handleMassiveOrderChange,
-  handleSimpleOrderChange,
+  handleMassOrderChange,
+  handleSingleOrderChange,
   needsRebalancing,
-  validateOrderChange
+  validateOrderSelloutInput
 } from "@/utils/product.utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -18,13 +18,13 @@ import Sonner from "./Sonner";
 
 export default function FormMoveProduct() {
   const {
-    isloadingButton,
+    isFormButtonLoading,
     productToMove,
-    products,
-    setProducts,
+    displayedProducts,
+    setDisplayedProducts,
     setAllProducts,
     setIsFormOrderSelloutOpen,
-    setOpenDrawer,
+    setIsDrawerOpen,
     setFormIsDirty
   } = useProducts();
 
@@ -33,7 +33,7 @@ export default function FormMoveProduct() {
     handleSubmit,
     formState: { errors, isDirty }
   } = useForm<ProductToMoveForm>({
-    resolver: zodResolver(productToMoveSchema),
+    resolver: zodResolver(productToMoveFormSchema),
     mode: "onChange"
   });
 
@@ -42,10 +42,10 @@ export default function FormMoveProduct() {
   }, [isDirty]);
 
   const onSubmitChangeOrderSellout = async (formData: ProductToMoveForm) => {
-    const currentOrderSellout = products.findIndex((p) => p.id === productToMove.id) + 1;
+    const currentOrderSellout = displayedProducts.findIndex((p) => p.id === productToMove.id) + 1;
     const newOrderSellout = formData.neworderSellout;
 
-    const validationError = validateOrderChange(newOrderSellout, currentOrderSellout, products.length);
+    const validationError = validateOrderSelloutInput(newOrderSellout, currentOrderSellout, displayedProducts.length);
     if (validationError) {
       Sonner({
         message: validationError,
@@ -63,10 +63,16 @@ export default function FormMoveProduct() {
     }
 
     try {
-      if (needsRebalancing(products)) {
-        await handleMassiveOrderChange(newOrderSellout, productToMove, setProducts, setAllProducts);
+      if (needsRebalancing(displayedProducts)) {
+        await handleMassOrderChange(newOrderSellout, productToMove, setDisplayedProducts, setAllProducts);
       } else {
-        await handleSimpleOrderChange(productToMove.id, products, formData, setProducts, setAllProducts);
+        await handleSingleOrderChange(
+          productToMove.id,
+          displayedProducts,
+          formData,
+          setDisplayedProducts,
+          setAllProducts
+        );
       }
 
       Sonner({
@@ -74,10 +80,10 @@ export default function FormMoveProduct() {
         sonnerState: "success"
       });
       setIsFormOrderSelloutOpen(false);
-      setOpenDrawer(false);
+      setIsDrawerOpen(false);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Ocurrió un error al actualizar el orden del producto";
+        error instanceof Error ? error.message : "Hubo un error al cambiar el orden sellout. Intenta más tarde.";
 
       Sonner({
         message: errorMessage,
@@ -111,8 +117,8 @@ export default function FormMoveProduct() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isloadingButton}>
-        {isloadingButton ? <Loader /> : "Enviar"}
+      <Button type="submit" className="w-full" disabled={isFormButtonLoading}>
+        {isFormButtonLoading ? <Loader /> : "Enviar"}
       </Button>
     </form>
   );

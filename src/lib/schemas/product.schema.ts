@@ -28,7 +28,7 @@ export const productFormSchema = z
     path: ["endDate"]
   });
 
-export const productToMoveSchema = z.object({
+export const productToMoveFormSchema = z.object({
   neworderSellout: z
     .number({
       required_error: "El orden sellout es obligatorio",

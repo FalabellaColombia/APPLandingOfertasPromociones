@@ -7,8 +7,6 @@ import { Controller } from "react-hook-form";
 import { isDirty } from "zod";
 import { useProductActions } from "./useProductActions";
 import { useProductForm } from "./useProductForm";
-import { useRealtimeSync } from "./useRealtimeSync";
-import { useSyncManager } from "./useSyncManager";
 
 export function useProductsProvider() {
   const [isLoading, setIsloading] = useState(true);
@@ -23,24 +21,24 @@ export function useProductsProvider() {
 
   const {
     // General State
-    isloadingButton,
+    isFormButtonLoading,
     isModalOpen,
     setIsModalOpen,
-    openDrawer,
-    setOpenDrawer,
-    activeButton,
-    setActiveButton,
+    isDrawerOpen,
+    setIsDrawerOpen,
+    currentView,
+    setCurrentView,
 
     // Products
     allProducts,
     setAllProducts,
-    products,
-    setProducts,
+    displayedProducts,
+    setDisplayedProducts,
     productToMove,
 
     // Edition
-    formEditingIsOpen,
-    setFormEditingIsOpen,
+    isFormEditingOpen,
+    setIsFormEditingOpen,
     isFormOrderSelloutOpen,
     setIsFormOrderSelloutOpen,
 
@@ -52,14 +50,14 @@ export function useProductsProvider() {
     handleHideProduct,
     handleUnhideProduct,
     handlePrepareChangeOrderSelloutForm
-  } = useProductActions({ reset });
+  } = useProductActions();
 
   const syncProducts = async () => {
     try {
       setIsSync(true);
       const data = await getAllProducts();
       setAllProducts(data);
-      setProducts(() => getVisibleProducts(data));
+      setDisplayedProducts(() => getVisibleProducts(data));
     } catch (error) {
       console.error("Error cargando los productos:", error);
       Sonner({
@@ -71,21 +69,22 @@ export function useProductsProvider() {
       setIsSync(false);
     }
   };
-  const { markRealtimeActive } = useSyncManager({
+
+  /*  const { markRealtimeActive } = useSyncManager({
     setAllProducts,
-    setProducts,
-    activeButton,
+    setDisplayedProducts,
+    currentView,
     setIsSync
   });
-
-  useRealtimeSync({
-    activeButton,
+ */
+  /* useRealtimeSync({
+    currentView,
     setAllProducts,
-    setProducts,
+    setDisplayedProducts,
     markRealtimeActive,
     setIsSync,
     syncProducts
-  });
+  }); */
 
   useEffect(() => {
     syncProducts();
@@ -95,7 +94,7 @@ export function useProductsProvider() {
   const onSubmitForm = (data: ProductForm) => {
     const payload: Product = formatProductDates(data);
 
-    if (formEditingIsOpen) {
+    if (isFormEditingOpen) {
       handleEditProduct(payload);
     } else {
       handleAddProduct(payload);
@@ -106,7 +105,7 @@ export function useProductsProvider() {
     if (formIsDirty) {
       setShowConfirmDialog(true);
     } else {
-      setOpenDrawer(false);
+      setIsDrawerOpen(false);
       setFormIsDirty(false);
       setIsFormOrderSelloutOpen(false);
     }
@@ -116,8 +115,8 @@ export function useProductsProvider() {
     // Data
     allProducts,
     setAllProducts,
-    products,
-    setProducts,
+    displayedProducts,
+    setDisplayedProducts,
     pagination,
     setPagination,
     isLoading,
@@ -133,8 +132,8 @@ export function useProductsProvider() {
     reset,
     errors,
     isDirty,
-    formEditingIsOpen,
-    setFormEditingIsOpen,
+    isFormEditingOpen,
+    setIsFormEditingOpen,
     formIsDirty,
     setFormIsDirty,
     setIsFormOrderSelloutOpen,
@@ -142,8 +141,8 @@ export function useProductsProvider() {
     // UI State
     isModalOpen,
     setIsModalOpen,
-    openDrawer,
-    setOpenDrawer,
+    isDrawerOpen,
+    setIsDrawerOpen,
     showConfirmDialog,
     setShowConfirmDialog,
     isFormOrderSelloutOpen,
@@ -160,8 +159,8 @@ export function useProductsProvider() {
     handlePrepareChangeOrderSelloutForm,
 
     // View State
-    activeButton,
-    setActiveButton,
-    isloadingButton
+    currentView,
+    setCurrentView,
+    isFormButtonLoading
   };
 }

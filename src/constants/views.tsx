@@ -1,2 +1,6 @@
-export const VIEW_LISTADO = 'Listado Productos'
-export const VIEW_OCULTOS = 'Productos Ocultos'
+export const VIEW_VISIBLEPRODUCTS = "Productos Visibles";
+export const VIEW_HIDDENPRODUCTS = "Productos Ocultos";
+
+export type ProductView = 
+  | typeof VIEW_VISIBLEPRODUCTS 
+  | typeof VIEW_HIDDENPRODUCTS;
