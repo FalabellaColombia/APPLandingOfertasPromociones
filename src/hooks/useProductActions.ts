@@ -135,8 +135,8 @@ export function useProductActions() {
       const updatedAllProducts = allProducts.filter((p) => p.id !== id);
       setAllProducts(updatedAllProducts);
 
-      const updatedProducts = displayedProducts.filter((p) => p.id !== id);
-      setDisplayedProducts(updatedProducts);
+      const updatedDisplayedProducts = displayedProducts.filter((p) => p.id !== id);
+      setDisplayedProducts(updatedDisplayedProducts);
 
       Sonner({
         message: "Producto eliminado correctamente",
@@ -162,10 +162,10 @@ export function useProductActions() {
     }
     try {
       const hiddenProduct = await hideProduct(id);
-      const updatedList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
-      const visibleProducts = getVisibleProducts(updatedList);
+      const updatedProductList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
+      const visibleProducts = getVisibleProducts(updatedProductList);
 
-      setAllProducts(updatedList);
+      setAllProducts(updatedProductList);
       setDisplayedProducts(visibleProducts);
       Sonner({
         message: "Producto ocultado correctamente",
@@ -194,8 +194,8 @@ export function useProductActions() {
       const maxOrderSellout = await getMaxOrderSellout();
       const unhiddenProduct = await unhideProduct(maxOrderSellout, id);
 
-      const updatedList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
-      const sortedList = updatedList.sort((a, b) => a.orderSellout - b.orderSellout);
+      const updatedProductList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
+      const sortedList = updatedProductList.sort((a, b) => a.orderSellout - b.orderSellout);
       const visibleProducts = getVisibleProducts(sortedList);
 
       setAllProducts(sortedList);
