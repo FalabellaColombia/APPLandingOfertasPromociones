@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 // Generar nombres únicos para evitar conflictos entre ejecuciones
 const DATE = Date.now();
-const PRODUCT_NAME = `ProductTestFlow_${DATE}`;
-const PRODUCT_EDITED_NAME = `ProductTestFlow_DELETE_${DATE}`;
+const PRODUCT_NAME = "ProductTestFlow";
+const PRODUCT_EDITED_NAME = `ProductTestFlow_${DATE}`;
 
 test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a product", async ({ page }) => {
   // Navegar al dashboard de la aplicación
