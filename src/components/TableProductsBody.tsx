@@ -42,14 +42,14 @@ export default function TableProductsBody({ isLoading, displayedProducts, table 
               </TableCell>
             </TableRow>
           ) : hasNoResults ? (
-            <TableRow className="hover:bg-transparent">
+            <TableRow className="hover:bg-transparent" data-testid="product-empty">
               <TableCell colSpan={table.getAllColumns().length} className="py-8">
                 <p className="w-full grow text-sm text-center">No se encontraron productos</p>
               </TableCell>
             </TableRow>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} data-testid="product-item">
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-xs pl-1">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

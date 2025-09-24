@@ -142,11 +142,14 @@ export default function Form() {
                   value={value ?? null}
                   onChange={onChange}
                   className={`*:not-first:mt-1 ${error ? "border-red-500" : ""}`}
+                  data-testid="start-date"
                 >
                   <LabelAria className="text-foreground text-sm font-medium">Fecha Inicio</LabelAria>
                   <div className="flex">
                     <Group className="w-full">
-                      <DateInput className={error ? "border-red-400" : "" + " pe-9"} />
+                      <div data-testid="start-date-wrapper">
+                        <DateInput className={error ? "border-red-400" : "" + " pe-9"} />
+                      </div>
                     </Group>
                     <ButtonAria className="text-muted-foreground/80 hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-ring/50 z-10 -ms-9 -me-px flex w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none data-focus-visible:ring-[3px]">
                       <CalendarIcon size={16} />
@@ -181,6 +184,7 @@ export default function Form() {
                   value={value ?? null}
                   onChange={onChange}
                   className={`*:not-first:mt-1 ${error ? "border-red-500" : ""}`}
+                  data-testid="end-date"
                 >
                   <LabelAria className="text-foreground text-sm font-medium">Fecha Fin</LabelAria>
                   <div className="flex">

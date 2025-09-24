@@ -50,7 +50,7 @@ export function useProductsProvider() {
     handleHideProduct,
     handleUnhideProduct,
     handlePrepareChangeOrderSelloutForm
-  } = useProductActions();
+  } = useProductActions({ reset });
 
   const syncProducts = async () => {
     try {

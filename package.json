@@ -11,7 +11,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npx playwright test appcrud",
+    "test-chromium": "npx playwright test appcrud --project=chromium",
+    "test-chromium-debug": "npx playwright test appcrud --project=chromium --headed --debug",
+    "test-codegen": "npx playwright codegen http://localhost:5173/dashboard"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -53,6 +57,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.55.0",
     "@types/node": "^22.15.17",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

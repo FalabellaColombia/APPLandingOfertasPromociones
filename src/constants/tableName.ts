@@ -1,1 +1,1 @@
-export const TABLE_NAME = 'listProducts_duplicate'
+export const TABLE_NAME = 'listProducts'

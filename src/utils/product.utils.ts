@@ -32,7 +32,7 @@ export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
     orderSellout: maxOrderSelloutUI,
     category: "Hogar",
-    title: "asdasdsa",
+    title: "ProductExample",
     urlProduct:
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
     urlImage:

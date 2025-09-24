@@ -11,10 +11,12 @@ import {
 } from "@/utils/product.utils";
 import { parseDate } from "@internationalized/date";
 import { useState } from "react";
-import { useProductForm } from "./useProductForm";
 
-export function useProductActions() {
-  const { reset } = useProductForm();
+type UseProductActionsParams = {
+  reset: (values?: ProductForm) => void;
+};
+
+export function useProductActions({ reset }: UseProductActionsParams) {
   const [isFormButtonLoading, setIsFormButtonLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
