@@ -75,7 +75,9 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   await expect(editedProductRow).toBeVisible();
 
   // Verificar que el nombre anterior ya no existe (no quedó duplicado)
-  const oldNameProducts = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_NAME });
+  const oldNameProducts = page.locator('[data-testid="product-item"]').filter({
+    has: page.getByText(PRODUCT_NAME, { exact: true })
+  });
   await expect(oldNameProducts).toHaveCount(0);
 
   // ============================================================================
