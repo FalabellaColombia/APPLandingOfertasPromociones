@@ -4,7 +4,7 @@ export type UseRealtimeSyncProps = {
   currentView: string;
   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   setDisplayedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-  markRealtimeActive: () => void;
+  updateLastRealtimeEvent: () => void;
   setIsSync: React.Dispatch<React.SetStateAction<boolean>>;
   syncProducts: () => Promise<void>;
 };

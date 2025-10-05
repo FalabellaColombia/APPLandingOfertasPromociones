@@ -53,7 +53,7 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
     }
   };
 
-  const markRealtimeActive = () => {
+  const updateLastRealtimeEvent = () => {
     lastRealtimeEvent.current = Date.now();
   };
 
@@ -72,5 +72,5 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
 
-  return { markRealtimeActive, setIsSync };
+  return { updateLastRealtimeEvent, setIsSync };
 }

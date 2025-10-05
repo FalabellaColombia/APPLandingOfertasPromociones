@@ -2,11 +2,12 @@ import { getAllProducts } from "@/api/products";
 import Sonner from "@/components/Sonner";
 import type { Product, ProductForm } from "@/types/product";
 import { formatProductDates, getVisibleProducts } from "@/utils/product.utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 import { isDirty } from "zod";
 import { useProductActions } from "./useProductActions";
 import { useProductForm } from "./useProductForm";
+import { useRealtimeSync } from "./useRealtimeSync";
 
 export function useProductsProvider() {
   const [isLoading, setIsloading] = useState(true);
@@ -70,21 +71,28 @@ export function useProductsProvider() {
     }
   };
 
-  /*  const { markRealtimeActive } = useSyncManager({
+  /*  const { updateLastRealtimeEvent } = useSyncManager({
     setAllProducts,
     setDisplayedProducts,
     currentView,
     setIsSync
   });
  */
-  /* useRealtimeSync({
+
+  const lastRealtimeEvent = useRef(Date.now());
+
+  const updateLastRealtimeEvent = () => {
+    lastRealtimeEvent.current = Date.now();
+  };
+
+  useRealtimeSync({
     currentView,
     setAllProducts,
     setDisplayedProducts,
-    markRealtimeActive,
+    updateLastRealtimeEvent,
     setIsSync,
     syncProducts
-  }); */
+  });
 
   useEffect(() => {
     syncProducts();

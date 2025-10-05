@@ -6,8 +6,7 @@ import {
   getChangedFields,
   getDefaultEditProductForm,
   getDefaultResetForm,
-  getProductPosition,
-  getVisibleProducts
+  getProductPosition
 } from "@/utils/product.utils";
 import { parseDate } from "@internationalized/date";
 import { useState } from "react";
@@ -39,10 +38,11 @@ export function useProductActions({ reset }: UseProductActionsParams) {
     try {
       const maxOrderSellout = await getMaxOrderSellout();
       const dataToSend = { ...formData, orderSellout: maxOrderSellout };
-      const addedProduct = await addProduct(dataToSend);
+      await addProduct(dataToSend);
 
-      setAllProducts((prevProducts) => [...prevProducts, addedProduct]);
-      setDisplayedProducts((prevProducts) => [...prevProducts, addedProduct]);
+      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
+      // setAllProducts((prevProducts) => [...prevProducts, addedProduct]);
+      // setDisplayedProducts((prevProducts) => [...prevProducts, addedProduct]);
 
       setIsModalOpen(false);
       setIsDrawerOpen(false);
@@ -53,6 +53,10 @@ export function useProductActions({ reset }: UseProductActionsParams) {
       });
     } catch (error) {
       console.error(error);
+      Sonner({
+        message: "Error al agregar el producto",
+        sonnerState: "error"
+      });
     } finally {
       setIsFormButtonLoading(false);
     }
@@ -95,22 +99,22 @@ export function useProductActions({ reset }: UseProductActionsParams) {
         setIsFormButtonLoading(false);
         return;
       }
-      const productUpdated = await editProduct(changedFields, productIdToEdit);
-      if (productUpdated) {
-        Sonner({
-          message: "Producto actualizado correctamente",
-          sonnerState: "success"
-        });
+      await editProduct(changedFields, productIdToEdit);
 
-        setAllProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
-        setDisplayedProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
+      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
+      // setAllProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
+      // setDisplayedProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
 
-        setIsFormEditingOpen(false);
-        setIsDrawerOpen(false);
-        reset(getDefaultResetForm());
-        setProductIdToEdit(null);
-        setOriginalProductData(null);
-      }
+      Sonner({
+        message: "Producto actualizado correctamente",
+        sonnerState: "success"
+      });
+
+      setIsFormEditingOpen(false);
+      setIsDrawerOpen(false);
+      reset(getDefaultResetForm());
+      setProductIdToEdit(null);
+      setOriginalProductData(null);
     } catch (error) {
       Sonner({
         message: "Ocurrió un error al editar el producto",
@@ -134,11 +138,12 @@ export function useProductActions({ reset }: UseProductActionsParams) {
 
     try {
       await deleteProduct(id);
-      const updatedAllProducts = allProducts.filter((p) => p.id !== id);
-      setAllProducts(updatedAllProducts);
 
-      const updatedDisplayedProducts = displayedProducts.filter((p) => p.id !== id);
-      setDisplayedProducts(updatedDisplayedProducts);
+      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
+      // const updatedAllProducts = allProducts.filter((p) => p.id !== id);
+      // setAllProducts(updatedAllProducts);
+      // const updatedDisplayedProducts = displayedProducts.filter((p) => p.id !== id);
+      // setDisplayedProducts(updatedDisplayedProducts);
 
       Sonner({
         message: "Producto eliminado correctamente",
@@ -163,12 +168,14 @@ export function useProductActions({ reset }: UseProductActionsParams) {
       return;
     }
     try {
-      const hiddenProduct = await hideProduct(id);
-      const updatedProductList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
-      const visibleProducts = getVisibleProducts(updatedProductList);
+      await hideProduct(id);
 
-      setAllProducts(updatedProductList);
-      setDisplayedProducts(visibleProducts);
+      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
+      // const updatedProductList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
+      // const visibleProducts = getVisibleProducts(updatedProductList);
+      // setAllProducts(updatedProductList);
+      // setDisplayedProducts(visibleProducts);
+
       Sonner({
         message: "Producto ocultado correctamente",
         sonnerState: "success"
@@ -194,15 +201,14 @@ export function useProductActions({ reset }: UseProductActionsParams) {
 
     try {
       const maxOrderSellout = await getMaxOrderSellout();
-      const unhiddenProduct = await unhideProduct(maxOrderSellout, id);
+      await unhideProduct(maxOrderSellout, id);
 
-      const updatedProductList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
-      const sortedList = updatedProductList.sort((a, b) => a.orderSellout - b.orderSellout);
-      const visibleProducts = getVisibleProducts(sortedList);
-
-      setAllProducts(sortedList);
-      setDisplayedProducts(visibleProducts);
-      setCurrentView(VIEW_VISIBLEPRODUCTS);
+      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
+      // const updatedProductList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
+      // const sortedList = updatedProductList.sort((a, b) => a.orderSellout - b.orderSellout);
+      // const visibleProducts = getVisibleProducts(sortedList);
+      // setAllProducts(sortedList);
+      // setDisplayedProducts(visibleProducts);
 
       Sonner({
         message: "Producto desocultado correctamente",
