@@ -13,9 +13,10 @@ import { useState } from "react";
 
 type UseProductActionsParams = {
   reset: (values?: ProductForm) => void;
+  setFormIsDirty: (isDirty: boolean) => void;
 };
 
-export function useProductActions({ reset }: UseProductActionsParams) {
+export function useProductActions({ reset, setFormIsDirty }: UseProductActionsParams) {
   const [isFormButtonLoading, setIsFormButtonLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -63,6 +64,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
   };
 
   const handlePrepareEditForm = (product: Product) => {
+    setFormIsDirty(false);
     setIsFormEditingOpen(true);
     setProductIdToEdit(product.id || null);
     setOriginalProductData(product);
@@ -224,6 +226,7 @@ export function useProductActions({ reset }: UseProductActionsParams) {
   };
 
   const handlePrepareChangeOrderSelloutForm = (productInfo: ProductToMove) => {
+    setFormIsDirty(false);
     const productId = productInfo.id;
     if (!productId) return;
     const OrderSelloutForUI = getProductPosition(displayedProducts, productId);

@@ -31,21 +31,30 @@ export default function FormMoveProduct() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isDirty }
   } = useForm<ProductToMoveForm>({
     resolver: zodResolver(productToMoveFormSchema),
-    mode: "onChange"
+    mode: "onChange",
+    defaultValues: {
+      neworderSellout: undefined
+    }
   });
 
   useEffect(() => {
+    reset({ neworderSellout: undefined });
+  }, [productToMove.id, reset]);
+
+  useEffect(() => {
     setFormIsDirty(isDirty);
-  }, [isDirty]);
+    return () => setFormIsDirty(false);
+  }, [isDirty, setFormIsDirty]);
 
   const onSubmitChangeOrderSellout = async (formData: ProductToMoveForm) => {
     const currentOrderSellout = displayedProducts.findIndex((p) => p.id === productToMove.id) + 1;
     const newOrderSellout = formData.neworderSellout;
-
     const validationError = validateOrderSelloutInput(newOrderSellout, currentOrderSellout, displayedProducts.length);
+
     if (validationError) {
       Sonner({
         message: validationError,
@@ -79,12 +88,12 @@ export default function FormMoveProduct() {
         message: "Orden actualizado correctamente",
         sonnerState: "success"
       });
+
       setIsFormOrderSelloutOpen(false);
       setIsDrawerOpen(false);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Hubo un error al cambiar el orden sellout. Intenta más tarde.";
-
       Sonner({
         message: errorMessage,
         sonnerState: "error"
@@ -116,7 +125,6 @@ export default function FormMoveProduct() {
           </p>
         )}
       </div>
-
       <Button type="submit" className="w-full" disabled={isFormButtonLoading}>
         {isFormButtonLoading ? <Loader /> : "Enviar"}
       </Button>

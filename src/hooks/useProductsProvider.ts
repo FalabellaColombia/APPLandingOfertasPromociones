@@ -51,7 +51,7 @@ export function useProductsProvider() {
     handleHideProduct,
     handleUnhideProduct,
     handlePrepareChangeOrderSelloutForm
-  } = useProductActions({ reset });
+  } = useProductActions({ reset, setFormIsDirty });
 
   const { updateLastRealtimeEvent, forceResync, isSyncing } = useSyncManager({
     setAllProducts,
