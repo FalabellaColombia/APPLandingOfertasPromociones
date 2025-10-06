@@ -1,15 +1,19 @@
-import Table from '@/components/Table'
-import Header from './../components/Header'
-import DialogDrawer from '@/components/DialogDrawer'
+import DialogDrawer from "@/components/DialogDrawer";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import Table from "@/components/Table";
+import Header from "./../components/Header";
 
 function Main() {
-   return (
+  return (
+    <>
+      <OfflineBanner />
       <div className="container mx-auto py-4">
-         <Header />
-         <Table />
-         <DialogDrawer />
+        <Header />
+        <Table />
+        <DialogDrawer />
       </div>
-   )
+    </>
+  );
 }
 
-export default Main
+export default Main;

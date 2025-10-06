@@ -1,16 +1,14 @@
 import { VIEW_HIDDENPRODUCTS, VIEW_VISIBLEPRODUCTS } from "@/constants/views";
 import Logout from "@/features/auth/components/Logout";
 import { useProducts } from "@/hooks/useProducts";
-import { cn } from "@/lib/utils";
 import { getHiddenProducts, getVisibleProducts } from "@/utils/product.utils";
-import { RefreshCcw } from "lucide-react";
 import appLogo from "../assets/appLogo.svg";
 import DarkMode from "./DarkMode";
 import MenuButton from "./MenuButton";
 import SyncButton from "./SyncButton";
 
 function Header() {
-  const { allProducts, currentView, setCurrentView, setPagination, setDisplayedProducts, isSync } = useProducts();
+  const { allProducts, currentView, setCurrentView, setPagination, setDisplayedProducts } = useProducts();
 
   return (
     <div className="flex items-center justify-between">
@@ -58,15 +56,6 @@ function Header() {
 
       <div className="flex space-x-2">
         <div className="flex space-x-2 border-r-2 pr-2">
-          <div
-            className={cn(
-              "size-9 rounded-md flex items-center justify-center transition-all duration-250 ease-in-out",
-              isSync ? "opacity-100 spin-reverse text-lime-500" : "opacity-0 pointer-events-none"
-            )}
-            title="Sincronizando cambios en tiempo real"
-          >
-            <RefreshCcw size={18} />
-          </div>
           <SyncButton />
         </div>
         <div className="flex space-x-2 ">

@@ -5,13 +5,10 @@ export type UseRealtimeSyncProps = {
   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   setDisplayedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   updateLastRealtimeEvent: () => void;
-  setIsSync: React.Dispatch<React.SetStateAction<boolean>>;
-  syncProducts: () => Promise<void>;
 };
 
-export type useSyncManagerProps = {
+export type UseSyncManagerProps = {
   setAllProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   setDisplayedProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   currentView: string;
-  setIsSync: React.Dispatch<React.SetStateAction<boolean>>;
 };

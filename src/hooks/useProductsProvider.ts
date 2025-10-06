@@ -2,12 +2,13 @@ import { getAllProducts } from "@/api/products";
 import Sonner from "@/components/Sonner";
 import type { Product, ProductForm } from "@/types/product";
 import { formatProductDates, getVisibleProducts } from "@/utils/product.utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { isDirty } from "zod";
 import { useProductActions } from "./useProductActions";
 import { useProductForm } from "./useProductForm";
 import { useRealtimeSync } from "./useRealtimeSync";
+import { useSyncManager } from "./useSyncManager";
 
 export function useProductsProvider() {
   const [isLoading, setIsloading] = useState(true);
@@ -16,7 +17,6 @@ export function useProductsProvider() {
     pageIndex: 0,
     pageSize: 25
   });
-  const [isSync, setIsSync] = useState<boolean>(false);
 
   const { register, handleSubmit, control, reset, errors, formIsDirty, setFormIsDirty } = useProductForm();
 
@@ -53,49 +53,38 @@ export function useProductsProvider() {
     handlePrepareChangeOrderSelloutForm
   } = useProductActions({ reset });
 
-  const syncProducts = async () => {
-    try {
-      setIsSync(true);
-      const data = await getAllProducts();
-      setAllProducts(data);
-      setDisplayedProducts(() => getVisibleProducts(data));
-    } catch (error) {
-      console.error("Error cargando los productos:", error);
-      Sonner({
-        message: "Error sincronizando. Intenta de nuevo",
-        sonnerState: "error"
-      });
-    } finally {
-      setIsloading(false);
-      setIsSync(false);
-    }
-  };
-
-  /*  const { updateLastRealtimeEvent } = useSyncManager({
+  const { updateLastRealtimeEvent, forceResync, isSyncing } = useSyncManager({
     setAllProducts,
     setDisplayedProducts,
-    currentView,
-    setIsSync
+    currentView
   });
- */
-
-  const lastRealtimeEvent = useRef(Date.now());
-
-  const updateLastRealtimeEvent = () => {
-    lastRealtimeEvent.current = Date.now();
-  };
 
   useRealtimeSync({
     currentView,
     setAllProducts,
     setDisplayedProducts,
-    updateLastRealtimeEvent,
-    setIsSync,
-    syncProducts
+    updateLastRealtimeEvent
   });
 
   useEffect(() => {
-    syncProducts();
+    const loadInitialData = async () => {
+      try {
+        setIsloading(true);
+        const data = await getAllProducts();
+        setAllProducts(data);
+        setDisplayedProducts(getVisibleProducts(data));
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+        Sonner({
+          message: "Error cargando productos",
+          sonnerState: "error"
+        });
+      } finally {
+        setIsloading(false);
+      }
+    };
+
+    loadInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -131,8 +120,6 @@ export function useProductsProvider() {
     pagination,
     setPagination,
     isLoading,
-    isSync,
-    syncProducts,
 
     // Form
     register,
@@ -158,6 +145,10 @@ export function useProductsProvider() {
     setShowConfirmDialog,
     isFormOrderSelloutOpen,
     productToMove,
+
+    // Sync
+    isSyncing,
+    forceResync,
 
     // Actions
     handleAddProduct,
