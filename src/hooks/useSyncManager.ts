@@ -110,7 +110,7 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
       if (sinceSync > 60000 || sinceRealtime > 120000) {
         lastSyncTimeRef.current = now;
         lastVisibilityChangeRef.current = now;
-        fullResync(true);
+        fullResync(false);
       } else {
         lastSyncTimeRef.current = now;
       }
@@ -138,7 +138,7 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
 
   return {
     updateLastRealtimeEvent,
-    forceResync: () => fullResync(false),
+    forceResync: () => fullResync(true),
     isSyncing,
     setIsSyncing
   };
