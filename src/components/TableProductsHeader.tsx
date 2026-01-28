@@ -6,13 +6,13 @@ import type { TableHeader } from "@/types/table";
 import { getDefaultAddProductForm, getMaxOrderSelloutForUI } from "@/utils/product.utils";
 import type { ColumnFilter, ColumnFiltersState } from "@tanstack/react-table";
 import { PlusIcon } from "lucide-react";
+import CategoryCategoryFilterBadges from "./CategoryFilterBadges";
+import CategoryFilterDropdown from "./CategoryFilterDropdown";
 import { Drawer } from "./Drawer";
-import FilterCategoryButton from "./FilterCategoryButton";
 import Form from "./Form";
 import FormMoveProduct from "./FormMoveProduct";
 import Search from "./Search";
 import { Button } from "./ui/button";
-import CategoryBadges from "./CategoryBadges'";
 
 export default function TableProductsHeader({ currentView, isFormOrderSelloutOpen }: TableHeader) {
   const { displayedProducts, reset, setIsFormEditingOpen, setIsDrawerOpen, isDrawerOpen } = useProducts();
@@ -63,7 +63,7 @@ export default function TableProductsHeader({ currentView, isFormOrderSelloutOpe
             </Button>
           )}
 
-          <FilterCategoryButton />
+          <CategoryFilterDropdown />
         </div>
 
         <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
@@ -71,7 +71,7 @@ export default function TableProductsHeader({ currentView, isFormOrderSelloutOpe
         </Drawer>
       </div>
 
-      <CategoryBadges />
+      <CategoryCategoryFilterBadges />
     </>
   );
 }

@@ -31,8 +31,8 @@ export function formatProductDates(formData: ProductForm) {
 export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
     orderSellout: maxOrderSelloutUI,
-    category: "Hogar",
-    title: "ProductExample",
+    category: ["hogar", "mujer" ],
+    title: "ProductExample2",
     urlProduct:
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
     urlImage:
@@ -47,7 +47,7 @@ export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
 export function getDefaultResetForm() {
   return {
     orderSellout: 0,
-    category: "",
+    category: [] as string[],
     title: "",
     urlProduct: "",
     urlImage: "",

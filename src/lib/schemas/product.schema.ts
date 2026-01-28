@@ -4,7 +4,7 @@ import { z } from "zod";
 export const productFormSchema = z
   .object({
     orderSellout: z.number(),
-    category: z.string().min(1, "La categoría es obligatoria"),
+    category: z.array(z.string()).min(1, "Selecciona al menos una categoría"),
     title: z.string().min(5, "El título es obligatorio").max(50, "Máximo 50 caracteres"),
     urlProduct: z
       .string()

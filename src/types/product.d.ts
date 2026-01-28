@@ -5,7 +5,7 @@ import type { z } from "zod";
 export type Product = {
   id?: string;
   orderSellout: number;
-  category: string;
+  category: string[];
   title: string;
   urlProduct: string;
   urlImage: string;
