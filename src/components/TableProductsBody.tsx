@@ -14,7 +14,7 @@ export default function TableProductsBody({ isLoading, displayedProducts, table 
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow className="hover:bg-transparent" key={headerGroup.id}>
+            <TableRow className="bg-muted/50" key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
@@ -51,7 +51,7 @@ export default function TableProductsBody({ isLoading, displayedProducts, table 
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-testid="product-item">
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-xs pl-1">
+                  <TableCell key={cell.id} className="text-[12.5px] pl-1">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

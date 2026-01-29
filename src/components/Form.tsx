@@ -125,15 +125,15 @@ export default function Form() {
           {...register("offerState")}
         >
           {OFFER_STATES.map((state) => (
-            <option key={state.value} value={state.value}>
-              {state.label}
+            <option key={String(state.value)} value={state.value ?? ""}>
+              {state.value ?? "Sin estado"}
             </option>
           ))}
         </SelectNative>
       </FormField>
 
       {/* Submit Button */}
-      <Button type="submit" className="w-full" disabled={isFormButtonLoading}>
+      <Button type="submit" className="w-full mt-1" disabled={isFormButtonLoading}>
         {isFormButtonLoading ? <Loader /> : isFormEditingOpen ? "Editar" : "Agregar"}
       </Button>
     </form>

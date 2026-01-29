@@ -15,7 +15,7 @@ function Header() {
       <div className="flex items-center space-x-10 mt-4 mb-7">
         <a
           className="flex items-center space-x-3 "
-          href="https://www.falabella.com.co/falabella-co/page/descuentos_ofertas_falabella?sid=HO_V1_ENCUENTRAACALASOFERTASIMPERDIBLESDELASEMANA_OTROS_NA_S17_139"
+          href="https://www.falabella.com.co/falabella-co/price-landing?filtersToHide=lo_mas_vendido,novedades&filterOrder=tecnologia,hombre,mujer,ninos,hogar?sid=HO_CB_AQUIENCUENTRASLASMEJORESOFERTASPARAEMPEZAREL2026_OTROS_NA_S52_51"
           target="_blank"
         >
           <img src={appLogo} alt="APP Landing Ofertas y Promociones" width={25} height={25} />

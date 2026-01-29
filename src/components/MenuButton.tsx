@@ -21,13 +21,7 @@ export default function MenuButton({ text, functionOnClick, isActive }: ButtonPr
       variant="outline"
       onClick={functionOnClick}
     >
-      {Icon && (
-        <Icon
-          className="-ms-1 opacity-60 transition-transform group-hover:-translate-x-0.5"
-          size={16}
-          aria-hidden="true"
-        />
-      )}
+      {Icon && <Icon className="-ms-1 opacity-60 transition-transform " size={16} aria-hidden="true" />}
       {text}
     </Button>
   );

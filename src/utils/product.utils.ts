@@ -39,7 +39,7 @@ export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
     startDate: parseDate("2025-08-14"),
     endDate: parseDate("2025-08-15"),
-    offerState: "",
+    offerState: null,
     isProductHidden: false
   };
 }

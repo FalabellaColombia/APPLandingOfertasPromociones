@@ -7,7 +7,7 @@ function Main() {
   return (
     <>
       <OfflineBanner />
-      <div className="container mx-auto py-4">
+      <div className="w-10/12 mx-auto py-4">
         <Header />
         <Table />
         <DialogDrawer />
