@@ -31,7 +31,7 @@ export function formatProductDates(formData: ProductForm) {
 export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
     orderSellout: maxOrderSelloutUI,
-    category: ["hogar", "mujer" ],
+    category: ["hogar", "mujer"],
     title: "ProductExample2",
     urlProduct:
       "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
@@ -61,14 +61,14 @@ export function getDefaultResetForm() {
 export function getDefaultEditProductForm(product: ProductForm) {
   return {
     orderSellout: product.orderSellout || 0,
-    category: product.category || "",
+    category: product.category?.filter((cat) => cat.trim()) || [],
     title: product.title || "",
     urlProduct: product.urlProduct || "",
     urlImage: product.urlImage || "",
     startDate: product.startDate,
     endDate: product.endDate,
-    offerState: product.offerState,
-    isProductHidden: product.isProductHidden || false
+    offerState: product.offerState || "",
+    isProductHidden: product.isProductHidden ?? false
   };
 }
 

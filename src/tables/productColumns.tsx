@@ -20,8 +20,14 @@ export const columns: ColumnDef<Product>[] = [
     size: 170,
     cell: ({ getValue }) => {
       const categories = getValue<string[]>();
-      return <ProductCategoryBadges categories={categories} />;   
+
+      if (!categories || categories.length === 0 || categories.every((cat) => !cat.trim())) {
+        return <span className="text-gray-400 italic pl-2">Sin categoría</span>;
+      }
+
+      return <ProductCategoryBadges categories={categories} />;
     },
+
     filterFn: (row, columnId, filterValue: string[]) => {
       const categories = row.getValue<string[]>(columnId);
       return categories.some((cat) => filterValue.includes(cat));
