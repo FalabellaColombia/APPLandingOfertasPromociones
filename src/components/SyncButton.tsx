@@ -57,7 +57,7 @@ function SyncButton() {
               variant="outline"
               size="icon"
               disabled={isDisabled}
-              className={`size-9 hover:!bg-muted transition-colors ${
+              className={`size-9 hover:!bg-muted cursor-pointer transition-colors ${
                 isDisabled ? "text-muted-foreground cursor-not-allowed" : ""
               }`}
             >

@@ -34,7 +34,7 @@ function Logout() {
                   onClick={handleLogout}
                   variant="outline"
                   size="icon"
-                  className="size-9 hover:!bg-muted">
+                  className="size-9 hover:!bg-muted cursor-pointer">
                   <LogOut aria-hidden="true" />
                </Button>
             </TooltipTrigger>

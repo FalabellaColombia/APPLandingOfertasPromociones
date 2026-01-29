@@ -47,6 +47,7 @@ export default function TableProductsHeader({ currentView, isFormOrderSelloutOpe
           />
           {searchValue !== "" && (
             <Button
+              className="cursor-pointer"
               variant="secondary"
               onClick={() => setColumnFilters((prev: ColumnFiltersState) => prev.filter((f) => f.id !== "title"))}
             >
@@ -57,7 +58,7 @@ export default function TableProductsHeader({ currentView, isFormOrderSelloutOpe
 
         <div className="flex gap-2 m-0">
           {currentView === VIEW_VISIBLEPRODUCTS && (
-            <Button className="aspect-square max-sm:p-0 m-0" onClick={handlePrepareAddProductForm}>
+            <Button className="aspect-square max-sm:p-0 m-0 cursor-pointer" onClick={handlePrepareAddProductForm}>
               <PlusIcon className="opacity-60 sm:-ms-1" size={16} aria-hidden="true" />
               <span className="max-sm:sr-only">Agregar Producto</span>
             </Button>

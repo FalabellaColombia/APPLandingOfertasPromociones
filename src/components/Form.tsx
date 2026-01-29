@@ -133,7 +133,7 @@ export default function Form() {
       </FormField>
 
       {/* Submit Button */}
-      <Button type="submit" className="w-full mt-1" disabled={isFormButtonLoading}>
+      <Button type="submit" className="w-full mt-1 cursor-pointer" disabled={isFormButtonLoading}>
         {isFormButtonLoading ? <Loader /> : isFormEditingOpen ? "Editar" : "Agregar"}
       </Button>
     </form>

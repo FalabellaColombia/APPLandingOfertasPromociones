@@ -15,7 +15,7 @@ export default function CategoryFilterDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="hover:!bg-muted">
+        <Button variant="outline" className="hover:!bg-muted cursor-pointer">
           <ListFilter size={16} />
           Filtrar
         </Button>
@@ -23,6 +23,7 @@ export default function CategoryFilterDropdown() {
       <DropdownMenuContent>
         {CATEGORIES.map(({ value, label }) => (
           <DropdownMenuCheckboxItem
+            className="cursor-pointer"
             key={label}
             checked={selectedCategories.includes(value)}
             onCheckedChange={() => toggleCategory(value)}
