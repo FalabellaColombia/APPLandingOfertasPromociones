@@ -1,16 +1,17 @@
 import DropDownMenu from "@/components/DropDownMenu";
 import ProductCategoryBadges from "@/components/ProductCategoryBadges";
+import { VIEW_VISIBLEPRODUCTS, type ProductView } from "@/constants/views";
 import type { Product } from "@/types/product";
 import type { ColumnDef } from "@tanstack/react-table";
 import { SquareArrowOutUpRight } from "lucide-react";
 
-export const columns: ColumnDef<Product>[] = [
+export const getColumns = (currentView: ProductView): ColumnDef<Product>[] => [
   {
     accessorKey: "orderSellout",
     header: "Orden Sellout",
     enableSorting: true,
     size: 120,
-    cell: ({ row }) => row.index + 1
+    cell: ({ row }) => (currentView === VIEW_VISIBLEPRODUCTS ? row.index + 1 : "-")
   },
   {
     accessorKey: "category",

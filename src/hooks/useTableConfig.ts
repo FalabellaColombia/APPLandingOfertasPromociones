@@ -1,20 +1,18 @@
-import { columns } from "@/tables/productColumns";
+import { getColumns } from "@/tables/productColumns";
 import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type SortingState,
-  useReactTable
+  useReactTable,
+  type SortingState
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFilters } from "./useFilters";
 import { useProducts } from "./useProducts";
-
 export function useTableConfig() {
   const { columnFilters, setColumnFilters } = useFilters();
   const [sorting, setSorting] = useState<SortingState>([]);
-  //const [sorting, setSorting] = useState<SortingState>([{ id: "orderSellout", desc: false }]);
 
   const {
     pagination,
@@ -27,9 +25,11 @@ export function useTableConfig() {
     isFormOrderSelloutOpen
   } = useProducts();
 
+  const tableColumns = useMemo(() => getColumns(currentView), [currentView]);
+  
   const table = useReactTable({
     data: displayedProducts,
-    columns: columns,
+    columns: tableColumns,
     state: {
       pagination,
       columnFilters,
