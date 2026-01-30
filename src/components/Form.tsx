@@ -34,7 +34,6 @@ export default function Form() {
     <form className="space-y-5" onSubmit={handleSubmit(onSubmitForm)}>
       <h3 className="mb-5 font-bold border-b-1 pb-3">{isFormEditingOpen ? "Editar Producto" : "Agregar Producto"}</h3>
 
-      {/* Order Sellout */}
       <FormField label="Orden Sellout" error={errors.orderSellout} htmlFor="orderSellout">
         <Input
           type="number"
@@ -46,7 +45,6 @@ export default function Form() {
         />
       </FormField>
 
-      {/* Categories */}
       <FormField label="Categorías" error={errors.category}>
         <Controller
           name="category"
@@ -74,7 +72,6 @@ export default function Form() {
         />
       </FormField>
 
-      {/* Title */}
       <FormField label="Llamado" error={errors.title} htmlFor="title">
         <Input
           id="title"
@@ -86,7 +83,6 @@ export default function Form() {
         />
       </FormField>
 
-      {/* URL Product */}
       <FormField label="URL" error={errors.urlProduct} htmlFor="urlProduct">
         <Input
           id="urlProduct"
@@ -98,7 +94,6 @@ export default function Form() {
         />
       </FormField>
 
-      {/* URL Image */}
       <FormField label="URL Imagen" error={errors.urlImage} htmlFor="urlImage">
         <Input
           id="urlImage"
@@ -110,13 +105,11 @@ export default function Form() {
         />
       </FormField>
 
-      {/* Dates */}
       <div className="flex justify-between space-x-3 mb-3">
         <DateField name="startDate" label="Fecha Inicio" control={control} />
         <DateField name="endDate" label="Fecha Fin" control={control} />
       </div>
 
-      {/* Offer State */}
       <FormField label="Estado Oferta" error={errors.offerState} htmlFor="offerState">
         <SelectNative
           id="offerState"
@@ -132,7 +125,6 @@ export default function Form() {
         </SelectNative>
       </FormField>
 
-      {/* Submit Button */}
       <Button type="submit" className="w-full mt-1 cursor-pointer" disabled={isFormButtonLoading}>
         {isFormButtonLoading ? <Loader /> : isFormEditingOpen ? "Editar" : "Agregar"}
       </Button>
@@ -140,7 +132,9 @@ export default function Form() {
   );
 }
 
+// -----------------------------------------------------------------------------
 // Reusable component for form fields (label + input + error message)
+// -----------------------------------------------------------------------------
 function FormField({
   label,
   error,
@@ -172,7 +166,9 @@ function FormField({
   );
 }
 
+// -----------------------------------------------------------------------------
 // Reusable component for date fields
+// -----------------------------------------------------------------------------
 type DateFieldProps<T extends FieldValues> = {
   name: Path<T>;
   label: string;

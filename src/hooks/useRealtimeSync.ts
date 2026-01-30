@@ -8,9 +8,11 @@ import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useEffect } from "react";
 
 /**
- * Hook que mantiene el estado sincronizado en tiempo real con Supabase
- * Escucha eventos INSERT, UPDATE y DELETE de la tabla de productos
- * y actualiza el estado global automáticamente
+ * Realtime synchronization layer for products.
+ *
+ * Keeps the local products state in sync with Supabase changes in real time.
+ * This hook is the primary source of truth for live updates and works together
+ * with the SyncManager as a fallback when Realtime becomes inactive.
  */
 export function useRealtimeSync({
   currentView,
@@ -18,10 +20,7 @@ export function useRealtimeSync({
   setDisplayedProducts,
   updateLastRealtimeEvent
 }: UseRealtimeSyncProps) {
-  /**
-   * Procesa eventos de Realtime y actualiza el estado global
-   * Se ejecuta cada vez que Supabase emite un cambio en la tabla
-   */
+  // Applies database changes (INSERT / UPDATE / DELETE) to local state
   const handleRealtimeEvent = (payload: RealtimePostgresChangesPayload<Product>) => {
     try {
       setAllProducts((prev) => {
@@ -33,11 +32,13 @@ export function useRealtimeSync({
               updated = [...prev, payload.new];
             }
             break;
+
           case "UPDATE":
             if (payload.new) {
               updated = prev.map((p) => (p.id === payload.new.id ? payload.new : p));
             }
             break;
+
           case "DELETE":
             if (payload.old) {
               updated = prev.filter((p) => p.id !== payload.old.id);
@@ -49,21 +50,22 @@ export function useRealtimeSync({
 
         const filtered =
           currentView === VIEW_VISIBLEPRODUCTS ? getVisibleProducts(updated) : getHiddenProducts(updated);
+
         setDisplayedProducts(filtered);
 
-        // Notificar al hook SyncManager que Realtime sigue activo
-        // Esto previene re-sincronizaciones innecesarias
+        // Signals that Realtime is active to avoid unnecessary full syncs
         updateLastRealtimeEvent();
 
         return updated;
       });
     } catch (error) {
-      console.error("[REALTIME] Error procesando evento:", error);
-    } 
+      console.error("[REALTIME] Error while processing event:", error);
+    }
   };
 
   /**
-   * Establece conexión con el canal de Realtime de Supabase
+   * Subscribes to Supabase Realtime changes for products.
+   * Automatically cleans up the channel on unmount or view change.
    */
   useEffect(() => {
     const channel = supabase

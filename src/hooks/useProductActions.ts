@@ -16,34 +16,48 @@ type UseProductActionsParams = {
   setFormIsDirty: (isDirty: boolean) => void;
 };
 
+/**
+ * Hook that centralizes all product-related actions and UI state.
+ * Handles CRUD operations, visibility, ordering (sellout),
+ * and form/drawer/modal coordination.
+ */
 export function useProductActions({ reset, setFormIsDirty }: UseProductActionsParams) {
+  // UI state
   const [isFormButtonLoading, setIsFormButtonLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFormEditingOpen, setIsFormEditingOpen] = useState(false);
   const [isFormOrderSelloutOpen, setIsFormOrderSelloutOpen] = useState(false);
+
+  // Products state
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+
+  // View state
   const [currentView, setCurrentView] = useState<ProductView>(VIEW_VISIBLEPRODUCTS);
+
+  // Edit tracking
   const [originalProductData, setOriginalProductData] = useState<Product | null>(null);
   const [productIdToEdit, setProductIdToEdit] = useState<string | null>(null);
+
+  // Order sellout change
   const [productToMove, setProductToMove] = useState<ProductToMove>({
     id: "",
     orderSellout: 0,
     title: ""
   });
 
+  /**
+   * Creates a new product and assigns it the last sellout position.
+   */
   const handleAddProduct = async (formData: Product) => {
     setIsFormButtonLoading(true);
 
     try {
       const maxOrderSellout = await getMaxOrderSellout();
       const dataToSend = { ...formData, orderSellout: maxOrderSellout };
-      await addProduct(dataToSend);
 
-      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
-      // setAllProducts((prevProducts) => [...prevProducts, addedProduct]);
-      // setDisplayedProducts((prevProducts) => [...prevProducts, addedProduct]);
+      await addProduct(dataToSend);
 
       setIsModalOpen(false);
       setIsDrawerOpen(false);
@@ -63,6 +77,10 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     }
   };
 
+  /**
+   * Prepares the edit form with the selected product data.
+   * Also stores the original data to later detect changes.
+   */
   const handlePrepareEditForm = (product: Product) => {
     setFormIsDirty(false);
     setIsFormEditingOpen(true);
@@ -82,6 +100,10 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     setIsDrawerOpen(true);
   };
 
+  /**
+   * Updates a product.
+   * Only changed fields are sent to the backend.
+   */
   const handleEditProduct = async (formData: Product) => {
     if (!productIdToEdit || !originalProductData) {
       Sonner({
@@ -90,46 +112,50 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
       });
       return;
     }
+
     setIsFormButtonLoading(true);
+
     try {
       const changedFields = getChangedFields(originalProductData, formData);
+
       if (Object.keys(changedFields).length === 0) {
         Sonner({
           message: "No se detectaron cambios",
           sonnerState: "warning"
         });
-        setIsFormButtonLoading(false);
         return;
       }
-      await editProduct(changedFields, productIdToEdit);
 
-      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
-      // setAllProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
-      // setDisplayedProducts((prev) => prev.map((p) => (p.id === productIdToEdit ? productUpdated[0] : p)));
+      await editProduct(changedFields, productIdToEdit);
 
       Sonner({
         message: "Producto actualizado correctamente",
         sonnerState: "success"
       });
 
+      // Reset edit state
       setIsFormEditingOpen(false);
       setIsDrawerOpen(false);
       reset(getDefaultResetForm());
       setProductIdToEdit(null);
       setOriginalProductData(null);
     } catch (error) {
+      console.error(error);
       Sonner({
         message: "Ocurrió un error al editar el producto",
         sonnerState: "error"
       });
-      console.error(error);
     } finally {
       setIsFormButtonLoading(false);
     }
   };
 
+  /**
+   * Permanently deletes a product.
+   */
   const handleDeleteProduct = async (productInfo: Product) => {
     const id = productInfo.id;
+
     if (!id) {
       Sonner({
         message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
@@ -140,12 +166,6 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
 
     try {
       await deleteProduct(id);
-
-      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
-      // const updatedAllProducts = allProducts.filter((p) => p.id !== id);
-      // setAllProducts(updatedAllProducts);
-      // const updatedDisplayedProducts = displayedProducts.filter((p) => p.id !== id);
-      // setDisplayedProducts(updatedDisplayedProducts);
 
       Sonner({
         message: "Producto eliminado correctamente",
@@ -160,8 +180,12 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     }
   };
 
+  /**
+   * Hides a product from the visible list.
+   */
   const handleHideProduct = async (product: Product) => {
     const id = product.id;
+
     if (!id) {
       Sonner({
         message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
@@ -169,14 +193,9 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
       });
       return;
     }
+
     try {
       await hideProduct(id);
-
-      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
-      // const updatedProductList = allProducts.map((p) => (p.id === id ? hiddenProduct : p));
-      // const visibleProducts = getVisibleProducts(updatedProductList);
-      // setAllProducts(updatedProductList);
-      // setDisplayedProducts(visibleProducts);
 
       Sonner({
         message: "Producto ocultado correctamente",
@@ -191,8 +210,12 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     }
   };
 
+  /**
+   * Restores a hidden product and places it at the end of the sellout order.
+   */
   const handleUnhideProduct = async (product: Product) => {
     const { id } = product;
+
     if (!id) {
       Sonner({
         message: "Error técnico: el producto no tiene ID. Contacta al soporte.",
@@ -204,13 +227,6 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     try {
       const maxOrderSellout = await getMaxOrderSellout();
       await unhideProduct(maxOrderSellout, id);
-
-      // Los cambios en la UI ahora se reflejan automáticamente a través de Realtime
-      // const updatedProductList = allProducts.map((p) => (p.id === id ? unhiddenProduct : p));
-      // const sortedList = updatedProductList.sort((a, b) => a.orderSellout - b.orderSellout);
-      // const visibleProducts = getVisibleProducts(sortedList);
-      // setAllProducts(sortedList);
-      // setDisplayedProducts(visibleProducts);
 
       Sonner({
         message: "Producto desocultado correctamente",
@@ -225,22 +241,27 @@ export function useProductActions({ reset, setFormIsDirty }: UseProductActionsPa
     }
   };
 
+  /**
+   * Prepares the form to change a product sellout order.
+   */
   const handlePrepareChangeOrderSelloutForm = (productInfo: ProductToMove) => {
     setFormIsDirty(false);
-    const productId = productInfo.id;
-    if (!productId) return;
-    const OrderSelloutForUI = getProductPosition(displayedProducts, productId);
+
+    if (!productInfo.id) return;
+
+    const orderSelloutForUI = getProductPosition(displayedProducts, productInfo.id);
+
     setIsDrawerOpen(true);
     setIsFormOrderSelloutOpen(true);
     setProductToMove({
-      id: productId,
-      orderSellout: OrderSelloutForUI,
+      id: productInfo.id,
+      orderSellout: orderSelloutForUI,
       title: productInfo.title
     });
   };
 
   return {
-    // General State
+    // General state
     isFormButtonLoading,
     isModalOpen,
     setIsModalOpen,

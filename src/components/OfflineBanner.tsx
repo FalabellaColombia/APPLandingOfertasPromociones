@@ -1,5 +1,3 @@
-// components/OfflineBanner.tsx
-
 import { TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 

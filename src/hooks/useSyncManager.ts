@@ -6,41 +6,34 @@ import { getHiddenProducts, getVisibleProducts } from "@/utils/product.utils";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Hook que mantiene sincronizados los productos cuando Realtime falla o se desconecta.
- * Detecta:
- * - Suspensión del equipo (>5 min)
- * - Cambio de pestaña (>1 min inactiva)
- * - Pérdida o regreso de internet
- * - Falta de eventos de Realtime (>2 min)
+ * Synchronization safety net for multi-client environments.
+ *
+ * This hook acts as a fallback when Supabase Realtime becomes unreliable
+ * or temporarily unavailable, ensuring local state consistency by
+ * forcing a full resync under specific risk scenarios.
  */
 export function useSyncManager({ setAllProducts, setDisplayedProducts, currentView }: UseSyncManagerProps) {
-  // Tiempos de control
+  // Timestamps used to detect stale state and missing Realtime activity
   const lastSyncTimeRef = useRef<number>(Date.now());
   const lastRealtimeEventRef = useRef<number>(Date.now());
   const lastVisibilityChangeRef = useRef<number>(0);
 
-  // Estado y flag de control
+  // Guards against overlapping or redundant full synchronizations
   const syncInProgressRef = useRef(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  /**
-   * Realiza una sincronización completa con la base de datos.
-   * Evita múltiples sincronizaciones simultáneas y muestra notificaciones según el contexto.
-   */
+  // Forces a full authoritative fetch from the database
+  // Used only when Realtime cannot be trusted
   const fullResync = async (showNotification = false) => {
-    // Evita sincronizar sin conexión
     if (!navigator.onLine) return;
-
-    // Evita ejecutar otra sincronización si ya hay una en curso
     if (syncInProgressRef.current) return;
 
     syncInProgressRef.current = true;
     setIsSyncing(true);
 
     try {
-      // Notificación opcional (por ejemplo, al volver a una pestaña activa)
       if (showNotification) {
-        Sonner({ message: "Sincronizando datos...", sonnerState: "info" });
+        Sonner({ message: "Syncing data...", sonnerState: "info" });
       }
 
       const products = await getAllProducts();
@@ -48,17 +41,17 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
 
       const filtered =
         currentView === VIEW_VISIBLEPRODUCTS ? getVisibleProducts(products) : getHiddenProducts(products);
+
       setDisplayedProducts(filtered);
 
-      // Muestra confirmación si aplica
       if (showNotification) {
-        Sonner({ message: "Datos actualizados", sonnerState: "success" });
+        Sonner({ message: "Data updated", sonnerState: "success" });
       }
     } catch (error) {
       console.error(error);
-      Sonner({ message: "Error al sincronizar", sonnerState: "error" });
+      Sonner({ message: "Sync error", sonnerState: "error" });
     } finally {
-      // Limpieza del estado sin importar el resultado
+      // Small delay avoids immediate re-entry during unstable states
       setTimeout(() => {
         syncInProgressRef.current = false;
         setIsSyncing(false);
@@ -66,24 +59,21 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
     }
   };
 
-  /**
-   * Marca el último evento recibido por Realtime.
-   * Permite detectar si ha pasado demasiado tiempo sin actividad.
-   */
+  // Heartbeat used to verify that Realtime is still delivering events
   const updateLastRealtimeEvent = () => {
     lastRealtimeEventRef.current = Date.now();
   };
 
-  /**
-   * Detecta suspensión del equipo.
-   * Si el tiempo entre intervalos supera los 5 minutos, se asume que el dispositivo estuvo suspendido.
-   */
+  // Detects device sleep or long execution pauses
+  // Forces a resync when time gaps exceed safe thresholds
   useEffect(() => {
     const checkSuspension = () => {
       const now = Date.now();
+
       if (now - lastSyncTimeRef.current > 5 * 60 * 1000) {
         fullResync(false);
       }
+
       lastSyncTimeRef.current = now;
     };
 
@@ -92,24 +82,21 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
 
-  /**
-   * Detecta cuando el usuario vuelve a la pestaña después de un tiempo inactiva.
-   * Si han pasado más de 60s desde la última sync o 120s desde el último evento Realtime, se sincroniza.
-   */
+  // Ensures state freshness when the user returns to the app
+  // after a prolonged period of inactivity
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState !== "visible") return;
 
       const now = Date.now();
-      const sinceVisibility = now - lastVisibilityChangeRef.current;
-      if (sinceVisibility < 60000) return; // throttle
+      if (now - lastVisibilityChangeRef.current < 60000) return;
 
       const sinceSync = now - lastSyncTimeRef.current;
       const sinceRealtime = now - lastRealtimeEventRef.current;
 
       if (sinceSync > 60000 || sinceRealtime > 120000) {
-        lastSyncTimeRef.current = now;
         lastVisibilityChangeRef.current = now;
+        lastSyncTimeRef.current = now;
         fullResync(false);
       } else {
         lastSyncTimeRef.current = now;
@@ -121,13 +108,10 @@ export function useSyncManager({ setAllProducts, setDisplayedProducts, currentVi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
 
-  /**
-   * Detecta recuperación de conexión.
-   * Cuando vuelve internet, fuerza una sincronización.
-   */
+  // Restores consistency after network interruptions
   useEffect(() => {
     const handleOnline = () => {
-      Sonner({ message: "Conexión restaurada", sonnerState: "success" });
+      Sonner({ message: "Connection restored", sonnerState: "success" });
       fullResync(false);
     };
 

@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CATEGORIES } from "@/constants/product";
 
 type ProductCategoryBadgesProps = {
-  categories: string[]; 
+  categories: string[];
 };
 
 const getCategoryLabel = (value: string) => CATEGORIES.find((c) => c.value === value)?.label ?? value;

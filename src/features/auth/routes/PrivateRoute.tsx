@@ -1,8 +1,7 @@
-// src/routes/PrivateRoute.tsx
+import { Loader } from '@/components/Loader'
+import supabase from '@/utils/supabase'
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import supabase from '@/utils/supabase'
-import { Loader } from '@/components/Loader'
 
 interface Props {
    children: React.ReactNode

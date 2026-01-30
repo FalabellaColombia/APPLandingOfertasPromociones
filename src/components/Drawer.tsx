@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { useProducts } from '@/hooks/useProducts'
+import { useEffect } from 'react'
 
 type DrawerProps = {
    isOpen: boolean

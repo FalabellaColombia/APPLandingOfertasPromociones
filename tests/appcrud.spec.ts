@@ -1,22 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-// Generar nombres únicos para evitar conflictos entre ejecuciones simultáneas
+// Generate unique names to avoid conflicts between simultaneous runs
 const DATE = Date.now();
 const PRODUCT_NAME = "ProductTestFlow";
 const PRODUCT_EDITED_NAME = `ProductTestFlow_${DATE}`;
-const REALTIME_TIMEOUT = 10000; // Timeout para esperar sincronización Realtime
+const REALTIME_TIMEOUT = 10000; // Timeout for waiting Realtime sync
 
 test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a product", async ({ page }) => {
-  // Ir al dashboard
+  // Go to dashboard
   await page.goto("/dashboard");
 
-  // ============================================================================
-  // CREATE - Crear un nuevo producto
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // CREATE - Create a new product
+  // ---------------------------------------------------------------------------
   await page.getByRole("button", { name: "Agregar Producto" }).click();
 
-  // Completar formulario
+  // Fill the form
   await page.getByLabel("Categoría").selectOption("Otros");
   await page.getByRole("textbox", { name: "Llamado" }).fill(PRODUCT_NAME);
   await page.getByRole("textbox", { name: "URL", exact: true }).fill("https://www.falabella.com.co/falabella-co");
@@ -24,7 +23,7 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
     .getByRole("textbox", { name: "URL Imagen", exact: true })
     .fill("https://www.falabella.com.co/falabella-co");
 
-  // Configurar fechas mediante teclado (para mayor control)
+  // Set dates via keyboard for control
   await page.locator('[data-testid="start-date"]').click();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
@@ -38,7 +37,7 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   await page.getByLabel("Estado Oferta").selectOption("Lanzamiento");
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
 
-  // Verificar creación del producto mediante Realtime
+  // Verify product creation via Realtime
   await page.getByRole("cell", { name: "Orden Sellout" }).locator("div").click();
   const products = page.locator('[data-testid="product-item"]').filter({
     has: page.getByText(PRODUCT_NAME, { exact: true })
@@ -46,14 +45,13 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   await expect(products).toHaveCount(1, { timeout: REALTIME_TIMEOUT });
   await expect(products.first()).toBeVisible();
 
-  // ============================================================================
-  // UPDATE - Editar el producto recién creado
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // UPDATE - Edit the newly created product
+  // ---------------------------------------------------------------------------
   const productRow = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_NAME });
   await expect(productRow).toBeVisible();
 
-  // Abrir menú y editar
+  // Open menu and edit
   await productRow.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Editar" }).click();
 
@@ -62,86 +60,82 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   await input.fill(PRODUCT_EDITED_NAME);
   await page.getByRole("button", { name: "Editar" }).click();
 
-  // Verificar actualización en tiempo real
+  // Verify update in Realtime
   const editedProductRow = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(editedProductRow).toHaveCount(1, { timeout: REALTIME_TIMEOUT });
   await expect(editedProductRow).toBeVisible();
 
-  // Asegurar que el nombre anterior ya no existe
+  // Ensure previous name no longer exists
   const oldNameProducts = page.locator('[data-testid="product-item"]').filter({
     has: page.getByText(PRODUCT_NAME, { exact: true })
   });
   await expect(oldNameProducts).toHaveCount(0);
 
-  // ============================================================================
-  // HIDE - Ocultar producto
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // HIDE - Hide product
+  // ---------------------------------------------------------------------------
   await editedProductRow.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Ocultar" }).click();
 
-  // Confirmar que desaparece de la vista de visibles
+  // Confirm it disappears from visible view
   await expect(page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME })).toHaveCount(0, {
     timeout: REALTIME_TIMEOUT
   });
 
-  // Cambiar a vista de productos ocultos
+  // Switch to hidden products view
   const hiddenProductsView = page.getByRole("button", { name: "Productos Ocultos" });
   await hiddenProductsView.click();
   await expect(hiddenProductsView).not.toHaveClass(/text-muted-foreground/);
 
-  // Verificar que aparece en productos ocultos
+  // Verify it appears in hidden products
   const hiddenProduct = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(hiddenProduct).toHaveCount(1, { timeout: REALTIME_TIMEOUT });
   await expect(hiddenProduct).toBeVisible();
 
-  // ============================================================================
-  // UNHIDE - Desocultar producto
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // UNHIDE - Unhide product
+  // ---------------------------------------------------------------------------
   await hiddenProduct.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Desocultar" }).click();
 
-  // Verificar que se elimina de la lista de ocultos
+  // Verify removal from hidden list
   await expect(hiddenProduct).toHaveCount(0, { timeout: REALTIME_TIMEOUT });
 
-  // Cambiar a vista de productos visibles
+  // Switch to visible products view
   const visibleProductsView = page.getByRole("button", { name: "Productos Visibles" });
   await visibleProductsView.click();
   await expect(visibleProductsView).not.toHaveClass(/text-muted-foreground/);
 
-  // Confirmar que reaparece en la vista principal
+  // Confirm it reappears in main view
   const unhidedProduct = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(unhidedProduct).toBeVisible({ timeout: REALTIME_TIMEOUT });
 
-  // ============================================================================
-  // CHANGE ORDERSELLOUT - Cambiar orden de prioridad
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // CHANGE ORDERSELLOUT - Change product priority
+  // ---------------------------------------------------------------------------
   const productToMove = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(productToMove).toBeVisible({ timeout: REALTIME_TIMEOUT });
 
   await productToMove.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Mover" }).click();
 
-  // Modificar orden sellout
+  // Modify sellout order
   await page.getByRole("spinbutton", { name: "Nuevo Orden Sellout" }).fill("20");
   await page.getByRole("button", { name: "Enviar" }).click();
 
-  // Validar cambio de orden
+  // Validate order change
   const movedProduct = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   const orderCell = movedProduct.locator("td").first();
   await expect(orderCell).toHaveText("20", { timeout: REALTIME_TIMEOUT });
 
-  // ============================================================================
-  // DELETE - Eliminar producto permanentemente
-  // ============================================================================
-
+  // ---------------------------------------------------------------------------
+  // DELETE - Permanently delete product
+  // ---------------------------------------------------------------------------
   await movedProduct.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Eliminar" }).click();
   await page.getByRole("button", { name: "Eliminar" }).click();
 
-  // Verificar que Realtime elimina el producto
+  // Verify Realtime removes the product
   const deletedProduct = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(deletedProduct).toHaveCount(0, { timeout: REALTIME_TIMEOUT });
 });

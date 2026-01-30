@@ -10,10 +10,17 @@ import {
 import { useMemo, useState } from "react";
 import { useFilters } from "./useFilters";
 import { useProducts } from "./useProducts";
+
+// Centralizes TanStack Table configuration and state wiring
+// for products, including filters, sorting and pagination
 export function useTableConfig() {
+  // Column-level filters (categories, etc.)
   const { columnFilters, setColumnFilters } = useFilters();
+
+  // Sorting state for the table
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // Product data and shared UI state
   const {
     pagination,
     setPagination,
@@ -25,8 +32,10 @@ export function useTableConfig() {
     isFormOrderSelloutOpen
   } = useProducts();
 
+  // Table columns depend on the current product view
   const tableColumns = useMemo(() => getColumns(currentView), [currentView]);
-  
+
+  // TanStack Table instance with all controlled state
   const table = useReactTable({
     data: displayedProducts,
     columns: tableColumns,

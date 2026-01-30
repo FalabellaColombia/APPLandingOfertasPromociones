@@ -2,11 +2,13 @@ import { editProduct, getAllProducts, massRebalanceAndMoveProduct } from "@/api/
 import type { Product, ProductForm, ProductToMove, ProductToMoveForm } from "@/types/product";
 import { CalendarDate, parseDate } from "@internationalized/date";
 
+// Minimum order value threshold that triggers a full server-side rebalance.
+// Repeated averaging during reordering can shrink values below this limit.
 const MIN_REBALANCE_VALUE = 2;
 
-// ============================================================================
-// UTILIDADES GENERALES DE PRODUCTOS
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Product utilities
+// -----------------------------------------------------------------------------
 
 export function getVisibleProducts(products: Product[]) {
   return products.filter((p) => !p.isProductHidden);
@@ -24,9 +26,9 @@ export function formatProductDates(formData: ProductForm) {
   };
 }
 
-// ============================================================================
-// UTILIDADES DE FORMULARIOS
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Form helpers
+// -----------------------------------------------------------------------------
 
 export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
@@ -77,7 +79,6 @@ export function getChangedFields<T extends Record<string, unknown>>(originalData
 
   for (const key in newData) {
     if (key === "orderSellout" || key === "id") continue;
-
     if (originalData[key] !== newData[key]) {
       changedFields[key] = newData[key];
     }
@@ -86,9 +87,9 @@ export function getChangedFields<T extends Record<string, unknown>>(originalData
   return changedFields;
 }
 
-// ============================================================================
-// UTILIDADES DE ORDENAMIENTO Y REORDENAMIENTO
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Ordering logic
+// -----------------------------------------------------------------------------
 
 export function getMaxOrderSelloutForUI(products: Product[]): number {
   return products.length + 1;
@@ -97,36 +98,30 @@ export function getMaxOrderSelloutForUI(products: Product[]): number {
 export function getProductPosition(products: Product[], productId: string): number {
   const sortedProducts = [...products].sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
   const index = sortedProducts.findIndex((p) => p.id === productId);
-  const value = index !== -1 ? index + 1 : 1;
-  return value;
+  return index !== -1 ? index + 1 : 1;
 }
 
+// Calculates a new order value by averaging neighboring positions.
+// This allows lightweight reordering without triggering a full rebalance.
 export const getReorderedPosition = (products: Product[], targetPosition: number, productToMoveId: string): number => {
   const targetIndex = targetPosition - 1;
   const otherProducts = products.filter((product) => product.id !== productToMoveId);
   const sortedProducts = otherProducts.sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
 
   if (targetIndex <= 0) {
-    if (sortedProducts.length === 0) {
-      return 100;
-    }
+    if (sortedProducts.length === 0) return 100;
     const firstValue = sortedProducts[0].orderSellout || 100;
     return firstValue / 2;
   }
 
   if (targetIndex >= sortedProducts.length) {
-    if (sortedProducts.length === 0) {
-      return 100;
-    }
+    if (sortedProducts.length === 0) return 100;
     const lastValue = sortedProducts[sortedProducts.length - 1].orderSellout || 0;
     return lastValue + 100;
   }
 
-  const prevProduct = sortedProducts[targetIndex - 1];
-  const nextProduct = sortedProducts[targetIndex];
-
-  const prevValue = prevProduct?.orderSellout || 0;
-  const nextValue = nextProduct?.orderSellout || 0;
+  const prevValue = sortedProducts[targetIndex - 1]?.orderSellout || 0;
+  const nextValue = sortedProducts[targetIndex]?.orderSellout || 0;
 
   return (prevValue + nextValue) / 2;
 };
@@ -137,6 +132,8 @@ export const updateProductOrder = (productList: Product[], productId: string, ne
     .sort((a, b) => (a.orderSellout || 0) - (b.orderSellout || 0));
 };
 
+// Determines when lightweight averaging is no longer safe
+// and a full server-side rebalance is required.
 export const needsRebalancing = (products: Product[]): boolean => {
   const visibleProducts = getVisibleProducts(products).filter((p) => p.orderSellout !== null);
   if (visibleProducts.length === 0) return false;
@@ -145,9 +142,9 @@ export const needsRebalancing = (products: Product[]): boolean => {
   return minValue < MIN_REBALANCE_VALUE;
 };
 
-// ============================================================================
-// VALIDACIONES
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Validation
+// -----------------------------------------------------------------------------
 
 export function validateOrderSelloutInput(
   newOrderSellout: number,
@@ -165,9 +162,9 @@ export function validateOrderSelloutInput(
   return null;
 }
 
-// ============================================================================
-// UTILIDADES INTERNAS
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Internal helpers
+// -----------------------------------------------------------------------------
 
 function updateStates(
   allProducts: Product[],
@@ -178,10 +175,12 @@ function updateStates(
   setproducts(getVisibleProducts(allProducts));
 }
 
-// ============================================================================
-// HANDLERS DE CAMBIO DE ORDEN
-// ============================================================================
+// -----------------------------------------------------------------------------
+// Order change handlers
+// -----------------------------------------------------------------------------
 
+// Uses a server-side RPC to normalize ordering when local reordering
+// becomes unstable due to repeated averaging or concurrent edits.
 export async function handleMassOrderChange(
   newOrderSellout: number,
   productToMove: ProductToMove,
@@ -191,22 +190,23 @@ export async function handleMassOrderChange(
   if (!productToMove.id) {
     throw new Error("Error técnico: el producto no tiene ID. Contacta al soporte.");
   }
-  try {
-    const { error: rebalanceError } = await massRebalanceAndMoveProduct(productToMove.id, newOrderSellout);
 
-    if (rebalanceError) {
-      console.error("Error en rebalanceo y movimiento:", rebalanceError);
-      throw new Error(`Error al mover el producto: ${rebalanceError.message || "Error desconocido"}`);
+  try {
+    const { error } = await massRebalanceAndMoveProduct(productToMove.id, newOrderSellout);
+    if (error) {
+      throw new Error(error.message || "Rebalance error");
     }
 
     const finalProducts = await getAllProducts();
     updateStates(finalProducts, setproducts, setAllProducts);
   } catch (error) {
     console.error(error);
-    throw error instanceof Error ? error : new Error("Error inesperado al rebalancear productos");
+    throw error instanceof Error ? error : new Error("Unexpected rebalance error");
   }
 }
 
+// Performs a lightweight reorder using averaged order values.
+// This avoids a full rebalance when the ordering space is still safe.
 export async function handleSingleOrderChange(
   productToMoveId: string,
   products: Product[],

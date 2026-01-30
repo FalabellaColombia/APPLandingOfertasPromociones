@@ -10,18 +10,25 @@ import { useProductForm } from "./useProductForm";
 import { useRealtimeSync } from "./useRealtimeSync";
 import { useSyncManager } from "./useSyncManager";
 
+// Main provider hook that centralizes product data,
+// form state, UI state, and realtime synchronization logic
 export function useProductsProvider() {
+  // Loading and global UI state
   const [isLoading, setIsloading] = useState(true);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  // Pagination state shared across product views
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 25
   });
 
+  // Product form state and helpers (create / edit)
   const { register, handleSubmit, control, reset, errors, formIsDirty, setFormIsDirty } = useProductForm();
 
+  // Product CRUD actions and related UI state
   const {
-    // General State
+    // General UI state
     isFormButtonLoading,
     isModalOpen,
     setIsModalOpen,
@@ -30,20 +37,20 @@ export function useProductsProvider() {
     currentView,
     setCurrentView,
 
-    // Products
+    // Product collections
     allProducts,
     setAllProducts,
     displayedProducts,
     setDisplayedProducts,
     productToMove,
 
-    // Edition
+    // Edition state
     isFormEditingOpen,
     setIsFormEditingOpen,
     isFormOrderSelloutOpen,
     setIsFormOrderSelloutOpen,
 
-    // Actions
+    // Product actions
     handleAddProduct,
     handleEditProduct,
     handlePrepareEditForm,
@@ -53,12 +60,14 @@ export function useProductsProvider() {
     handlePrepareChangeOrderSelloutForm
   } = useProductActions({ reset, setFormIsDirty });
 
+  // Manages conflict resolution and forced resyncs for realtime updates
   const { updateLastRealtimeEvent, forceResync, isSyncing } = useSyncManager({
     setAllProducts,
     setDisplayedProducts,
     currentView
   });
 
+  // Subscribes to realtime product changes and updates local state accordingly
   useRealtimeSync({
     currentView,
     setAllProducts,
@@ -66,6 +75,7 @@ export function useProductsProvider() {
     updateLastRealtimeEvent
   });
 
+  // Loads initial product data on mount
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -88,6 +98,7 @@ export function useProductsProvider() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Normalizes form data and routes it to create or edit flows
   const onSubmitForm = (data: ProductForm) => {
     const payload: Product = formatProductDates({
       ...data,
@@ -101,6 +112,7 @@ export function useProductsProvider() {
     }
   };
 
+  // Handles drawer close attempts, preventing data loss when the form is dirty
   const handleBackdropDrawerClick = () => {
     if (formIsDirty) {
       setShowConfirmDialog(true);

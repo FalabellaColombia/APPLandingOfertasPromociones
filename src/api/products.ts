@@ -66,6 +66,10 @@ export async function getMaxOrderSellout(): Promise<number> {
   return maxOrder + 100;
 }
 
+// Performs a server-side mass reordering via Supabase RPC.
+// Used when repeated reorders shrink order values below 2.
+// Normalizes visible products back to spaced integer positions
+// (e.g. 100, 200, 300) to keep ordering stable in realtime usage.
 export async function massRebalanceAndMoveProduct(productId: string, targetPosition: number) {
   return await supabase.rpc("mass_rebalance_and_move_product", {
     product_id_to_move: productId,

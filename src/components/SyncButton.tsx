@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useProducts } from "@/hooks/useProducts";
-import { RefreshCcw, LoaderCircle } from "lucide-react";
+import { LoaderCircle, RefreshCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 function SyncButton() {
