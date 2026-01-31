@@ -1,6 +1,6 @@
 import { editProduct, getAllProducts, massRebalanceAndMoveProduct } from "@/api/products";
 import type { Product, ProductForm, ProductToMove, ProductToMoveForm } from "@/types/product";
-import { CalendarDate, parseDate } from "@internationalized/date";
+import { CalendarDate } from "@internationalized/date";
 
 // Minimum order value threshold that triggers a full server-side rebalance.
 // Repeated averaging during reordering can shrink values below this limit.
@@ -33,14 +33,12 @@ export function formatProductDates(formData: ProductForm) {
 export function getDefaultAddProductForm(maxOrderSelloutUI: number) {
   return {
     orderSellout: maxOrderSelloutUI,
-    category: ["hogar", "mujer"],
-    title: "ProductExample2",
-    urlProduct:
-      "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
-    urlImage:
-      "https://www.falabella.com.co/falabella-co/category/cat6360942/Tenis?facetSelected=true&f.product.brandName=converse&f.range.derived.variant.discount=20%25+dcto+y+m%C3%A1s",
-    startDate: parseDate("2025-08-14"),
-    endDate: parseDate("2025-08-15"),
+    category: [],
+    title: "",
+    urlProduct: "",
+    urlImage: "",
+    startDate: undefined,
+    endDate: undefined,
     offerState: null,
     isProductHidden: false
   };
