@@ -16,7 +16,11 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   await page.getByRole("button", { name: "Agregar Producto" }).click();
 
   // Fill the form
-  await page.getByLabel("Categoría").selectOption("Otros");
+  await page.locator('button[role="combobox"]', { hasText: "Selecciona categorías..." }).click();
+  await page.getByRole("option", { name: "Tecnología" }).click();
+  await page.getByRole("option", { name: "Hogar" }).click();
+  await page.keyboard.press("Escape");
+ 
   await page.getByRole("textbox", { name: "Llamado" }).fill(PRODUCT_NAME);
   await page.getByRole("textbox", { name: "URL", exact: true }).fill("https://www.falabella.com.co/falabella-co");
   await page
@@ -24,12 +28,12 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
     .fill("https://www.falabella.com.co/falabella-co");
 
   // Set dates via keyboard for control
-  await page.locator('[data-testid="start-date"]').click();
+  await page.locator('[data-testid="startDate"]').click();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.type("381994");
 
-  await page.locator('[data-testid="end-date"]').click();
+  await page.locator('[data-testid="endDate"]').click();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.type("481994");
@@ -113,9 +117,14 @@ test("COMPLETE CRUD: add, edit, hide, unhide, change orderSellout and delete a p
   // ---------------------------------------------------------------------------
   // CHANGE ORDERSELLOUT - Change product priority
   // ---------------------------------------------------------------------------
+  // Search the product using the search input
+  await page.locator('input[placeholder="Buscar llamado..."]').fill(PRODUCT_EDITED_NAME);
+
+  // Wait for the product to appear in the filtered results
   const productToMove = page.locator('[data-testid="product-item"]', { hasText: PRODUCT_EDITED_NAME });
   await expect(productToMove).toBeVisible({ timeout: REALTIME_TIMEOUT });
 
+  // Open edit menu
   await productToMove.getByRole("button", { name: "Open edit menu" }).click();
   await page.getByRole("menuitem", { name: "Mover" }).click();
 
